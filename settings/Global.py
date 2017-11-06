@@ -1,8 +1,8 @@
 ####################
 # Gateway settings #
 ####################
-gatewayIp  = "192.168.178.48"   # The local IP address of your gateway
-gatewayKey = "LDJSVW4UPCH6aORG" # The connection code on the back of the gateway
+gatewayIp  = "000.000.000.000"  # The local IP address of your gateway
+gatewayKey = "xxxxxxxxxxxxxxxx" # The connection code on the back of the gateway
 
 
 ##################
