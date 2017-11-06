@@ -1,4 +1,4 @@
-# Onaeri
+# Onæri
 Onaeri helps to improve the users sleep rhythm by manipulating the lamps around the user. 
 
 This is not a standalone module, it needs a platform specific wrapper to work. This architecture allows for easy porting to new smart light systems. At this moment the following platforms have their own wrapper:
