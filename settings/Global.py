@@ -1,10 +1,3 @@
-####################
-# Gateway settings #
-####################
-gatewayIp  = "000.000.000.000"  # The local IP address of your gateway
-gatewayKey = "xxxxxxxxxxxxxxxx" # The connection code on the back of the gateway
-
-
 ##################
 # Basic settings #
 ##################
