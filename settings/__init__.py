@@ -105,7 +105,7 @@ def integrityValidation(userSettings):
     """
     Check integrity of settings
     """
-    cycleName = userSettings.__name__.split(".")[1]
+    cycleName = userSettings.__name__.split(".")[2]
     print("Validating user settings for %s: " % cycleName, end='', flush=True)
     _checkIntegrity(userSettings.userAlarmTime, check="time")
     _checkIntegrity(userSettings.userAlarmOffset, check="unsigned")

@@ -12,7 +12,7 @@ class Lookup:
     Calculates and dispenses lookup tables for light values
     """
     def __init__(self, config):
-        cycleName = config.__name__.split(".")[1]
+        cycleName = config.__name__.split(".")[2]
         print("Building lookup table for %s: " % cycleName, end="", flush=True)
 
         timeKeeper = TimeKeeper();
