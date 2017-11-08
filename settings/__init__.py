@@ -2,6 +2,7 @@ import os
 import importlib
 from . import Global
 from ..helper import printError, printWarning, printDone
+from .. import data
 
 blacklist = ["Global", "Template", "__init__"]
 
@@ -17,8 +18,7 @@ def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
 
 
     if check is None:
-        if type(val) is dict or type(val) is list or type(val) is tuple:
-            # If checking an iterable var:
+        if type(val) is list or type(val) is tuple:
             for v in val:
                 _ruling(v, (rmin, rmax))
         else:
@@ -51,6 +51,16 @@ _checkIntegrity(Global.totalDataPoints, check="unsigned")
 _checkIntegrity(Global.commandsTries, check="unsigned")
 _checkIntegrity(Global.mainLoopDelay, check="unsigned")
 _checkIntegrity(Global.settingFileExtention, check="string")
+
+_checkIntegrity(data.brightnessData['day'], 0, 100)
+_checkIntegrity(data.brightnessData['night'], 0, 100)
+_checkIntegrity(data.brightnessData['morning'], 0, 100)
+_checkIntegrity(data.brightnessData['evening'], 0, 100)
+_checkIntegrity(data.colorData['day'], 0, 100)
+_checkIntegrity(data.colorData['night'], 0, 100)
+_checkIntegrity(data.colorData['morning'], 0, 100)
+_checkIntegrity(data.colorData['evening'], 0, 100)
+_checkIntegrity(data.deviationData, 0, 100)
 printDone()
 
 
@@ -72,7 +82,7 @@ def _settingFileList():
 
 cycles = _settingFileList();
 if len(cycles) == 0:
-    printError("No setting files found. Please create a file in the `settings` folder using the template.")
+    printError("No setting files found. Please create a file in the `settings` folder using the Template.py.")
     exit()
 
 
@@ -80,7 +90,7 @@ if len(cycles) == 0:
 
 def get(settingFile=""):
     """
-    Return correct setting file
+    Return a setting file
     """
     if not settingFile in cycles:
         printError("Setting file %s not found" % settingFile)

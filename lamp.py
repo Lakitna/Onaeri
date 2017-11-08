@@ -25,9 +25,14 @@ class Lamp:
 
     def __str__(self):
         """
-        Return all values as string
+        Return all values that aren't None as string
         """
-        return str(self.__call__())
+        ret = {}
+        for var in self.__dict__:
+            val = getattr(self, var)
+            if not val is None:
+                ret[var.lstrip("_")] = val
+        return str(ret)
 
     def __eq__(self, other):
         """
@@ -42,14 +47,23 @@ class Lamp:
 
 
     def copy(self, obj):
+        """
+        Copy an object of same type
+        """
         for var in self.__dict__:
             exec("self.%s = obj.%s" % (var, var))
 
     def empty(self):
+        """
+        Set all values to None
+        """
         for var in self.__dict__:
             var = None
 
     def isEmpty(self):
+        """
+        Check if values in object are all None
+        """
         empty = True
         for var in self.__dict__:
             if not getattr(self, var) == None:

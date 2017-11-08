@@ -1,16 +1,15 @@
 """
 Onaeri API
+https://github.com/Lakitna/Onaeri
 """
 
-__version__ = '0.0.1a'
-__author__ = 'Sander van Beek'
+__version__ = '0.1.0'
 
 
 print("Onaeri API v%s" % __version__)
 print()
 
 
-# from . import settings
 
 from .cycle import Cycle
 from .timekeeper import TimeKeeper

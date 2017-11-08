@@ -9,7 +9,7 @@ import time
 
 class Lookup:
     """
-    Calculates and dispenses lookup tables for light values
+    Calculates and dispenses lookup tables for lamp values
     """
     def __init__(self, config):
         cycleName = config.__name__.split(".")[2]
@@ -55,7 +55,7 @@ class Lookup:
 
     def table(self, timeCode):
         """
-        Get the values associated with timecode
+        Get lamp values associated with timecode. Returns lamp object
         """
         self.lamp.brightness = scale(self.brightness[timeCode], (0,100), briRange, decimals=0)
         self.lamp.color      = scale(self.color[timeCode], (0,100), colorRange, decimals=0)
@@ -73,7 +73,7 @@ class Lookup:
 
     def _buildTable(self, source, sourceRange):
         """
-        Build a lookup table based on class attributes and a given data source.
+        Build a lookup table based on class attributes and a given data source. Returns list
         """
         # Resize morningSlope and eveningSlope
         source['morning'] = sequenceResize(source['morning'], self.config.morningSlopeDuration)

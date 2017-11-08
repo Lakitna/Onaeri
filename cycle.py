@@ -19,7 +19,7 @@ class Cycle:
         self.update = False
 
         self.lookup = Lookup( self.settings )
-        self.observer = Observer( self.group )
+        self.observer = Observer( self.group, name )
         self._deviation = Deviation( self.settings )
         self.lamp = Lamp()
         self.prevLamp = Lamp()

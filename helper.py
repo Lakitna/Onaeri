@@ -1,9 +1,9 @@
 def printError(string, end="\n", flush=False):
-    print("\033[1;31m%s\033[0;0m" % string, end=end, flush=flush)
+    print("\033[7;31m %s \033[0;0m" % string, end=end, flush=flush)
 def printWarning(string, end="\n", flush=False):
     print("\033[1;34m%s\033[0;0m" % string, end=end, flush=flush)
 def printDone():
-    print("\033[0;32m%s\033[0;0m" % "Done")
+    print("\033[7;32m%s\033[0;0m" % " Done ")
 
 
 def scale(val, inRange, outRange, decimals=1):
@@ -25,12 +25,6 @@ def scale(val, inRange, outRange, decimals=1):
     return ret
 
 
-def limitTo(val, rnge):
-    if val < rnge[0]:  val = rnge[0]
-    if val > rnge[1]:  val = rnge[1]
-    return val
-
-
 def sequenceResize(source, length):
     """
     Crude way of resizing a data sequence. Shrinking is here more accurate than expanding.
@@ -46,9 +40,18 @@ def sequenceResize(source, length):
     return out
 
 
+def limitTo(val, rnge):
+    """
+    Limit input value to a given absolute range
+    """
+    if val < rnge[0]:  val = rnge[0]
+    if val > rnge[1]:  val = rnge[1]
+    return val
+
+
 def inRange(val, rnge):
     """
-    Validate input value
+    Find out if input value is within a given absolute range
     """
     if rnge[0] <= val <= rnge[1]:
         return True

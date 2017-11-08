@@ -16,5 +16,5 @@ settingFileExtention = '.py'    # Extention of settings file, String
 ###############
 # Data tables #
 ###############
-minPerTimeCode  = .25            # Minutes per datapoint, unsigned float
+minPerTimeCode  = .5            # Minutes per datapoint, unsigned float
 totalDataPoints = round((24*60) // minPerTimeCode)

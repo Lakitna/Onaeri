@@ -8,10 +8,11 @@ class Observer:
     """
     Observe changes in a lamp
     """
-    def __init__(self, lampIds=[0]):
+    def __init__(self, lampIds=[0], cycleName=None):
         self.update = True
         self.data = Lamp()
         self.turnedOn = False
+        self._cycleName = cycleName
         self._container = self.data
         self._lampIds = lampIds
         self._legalChange = True
@@ -22,11 +23,7 @@ class Observer:
         """
         self.update = False
 
-        # print()
-        # for l in newData:
-        #     print(l)
-
-        # If observer is not inactive
+        # If observer recieved meaningfull data
         if not newData == None:
 
             self.turnedOn = False
@@ -57,13 +54,13 @@ class Observer:
 
     def _sameData(self, new, prev):
         """
-        Compare new to previous observed values. Returns True when both sets are the same.
+        Compare new to previous lamp values. Returns lamp object and sets update flag.
         """
         for i in range(len(new)):
             lamp = new[i]
             if not prev == lamp:
-                # print("[Observer] Illegal change in lamp %d: %s changed to %s" % (self._lampIds[i], key, new[i][key]))
-                print("[Observer] Illegal change in lamp %d: %s" % (self._lampIds[i], lamp))
+                print("\033[1;36m[Observer] Illegal change detected:")
+                print("\t%s: %s\033[0;0m" % (self._cycleName, lamp))
                 self.update = True
                 return lamp
         return new[0]
