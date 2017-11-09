@@ -13,7 +13,7 @@ def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
     """
     def _ruling(v, rnge):
         if not rnge[0] <= v <= rnge[1]:
-            printError("Invalid setting. '%s' is not in allowed range (%s - %s)." % (val, rmin, rmax))
+            printError("Invalid setting. '%s' is not in allowed range (%s - %s)." % (val, rnge[0], rnge[1]))
             exit()
 
 
