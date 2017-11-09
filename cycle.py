@@ -40,6 +40,7 @@ class Cycle:
 
             if self.observer.turnedOn:
                 self.lamp.copy(newVals)
+                self.lamp.power = None
                 self.update = True
                 self.observer.legalChange
                 self._deviation.reset()
