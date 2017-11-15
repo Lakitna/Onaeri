@@ -18,7 +18,8 @@ eveningSlopeDuration = 500      # Duration of eveningslope in minutes
 
 
 # How to treat the lamp
-automaticStateChange = True     # Allow the controller to automatically turn the lamps on/off
+automaticPowerOff = True        # Allow the controller to automatically turn the lamps off
+automaticPowerOn  = True        # Allow the controller to automatically turn the lamps on
 
 
 deviationDuration = 45          # Temporary cycle deviation duration in minutes

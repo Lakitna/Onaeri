@@ -34,6 +34,11 @@ def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
             printError("Invalid setting. '%s' is not a string." % (val))
             exit()
 
+    elif check is "boolean":
+        if not val == True or not val == False:
+            printError("Invalid setting. '%s' is not boolean." % (val))
+            exit()
+
     elif check is "time":
         _ruling(val[0], (0, 23))
         _ruling(val[1], (0, 59))
@@ -126,4 +131,6 @@ def integrityValidation(userSettings):
     _checkIntegrity(userSettings.morningSlopeDuration, check="unsigned")
     _checkIntegrity(userSettings.eveningSlopeDuration, check="unsigned")
     _checkIntegrity(userSettings.deviationDuration, check="unsigned")
+    _checkIntegrity(userSettings.automaticPowerOff, check="boolean")
+    _checkIntegrity(userSettings.automaticPowerOn, check="boolean")
     printDone()
