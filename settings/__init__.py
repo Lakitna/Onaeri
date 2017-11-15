@@ -35,7 +35,7 @@ def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
             exit()
 
     elif check is "boolean":
-        if not val == True or not val == False:
+        if not type(val) is bool:
             printError("Invalid setting. '%s' is not boolean." % (val))
             exit()
 
