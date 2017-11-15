@@ -67,10 +67,10 @@ class Cycle:
             if not vals.power == self.prevLamp.power:
                 lamp.power = vals.power
 
-            if not lamp.power = None:
-                if not self.settings.automaticPowerOff and lamp.power = False:
+            if not lamp.power == None:
+                if not self.settings.automaticPowerOff and lamp.power == False:
                     lamp.power = None
-                if not self.settings.automaticPowerOn and lamp.power = True:
+                if not self.settings.automaticPowerOn and lamp.power == True:
                     lamp.power = None
 
             self.update = True
