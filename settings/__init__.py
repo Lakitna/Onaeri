@@ -56,6 +56,7 @@ _checkIntegrity(Global.totalDataPoints, check="unsigned")
 _checkIntegrity(Global.commandsTries, check="unsigned")
 _checkIntegrity(Global.mainLoopDelay, check="unsigned")
 _checkIntegrity(Global.settingFileExtention, check="string")
+_checkIntegrity(Global.restartTime, check="time")
 
 _checkIntegrity(data.brightnessData['day'], 0, 100)
 _checkIntegrity(data.brightnessData['night'], 0, 100)

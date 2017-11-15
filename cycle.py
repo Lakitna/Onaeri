@@ -1,3 +1,5 @@
+import os, sys, time
+from .timekeeper import TimeKeeper
 from .lookup import Lookup
 from .helper import sequenceResize, printError, inRange, limitTo
 from .data import deviationData, briRange, colorRange
@@ -17,6 +19,9 @@ class Cycle:
         self.settings = settings.get( self.name )
         self.group = self._lampNameToIds( self.name )
         self.update = False
+
+        self._runTime = 0
+        self._resetTime = TimeKeeper().makeCode(settings.Global.restartTime)
 
         self.lookup = Lookup( self.settings )
         self.observer = Observer( self.group, name )
@@ -49,6 +54,11 @@ class Cycle:
                 self.lamp = self._compareWithPrevious( newVals )
 
             self.prevLamp.copy(newVals)
+
+
+            if timeKeeper.timeCode == self._resetTime and self._runTime > 1:
+                self._programRestart()
+            if timeKeeper.update:  self._runTime += 1
 
         return self.update
 
@@ -93,6 +103,13 @@ class Cycle:
             ret = [0] # Default to lamp 0
             printError("[Cycle] No lamps found with partial name `%s`. Use the Ikea Tradfri app to change the name of a lamp." % name)
         return ret
+
+
+    def _programRestart(self):
+        """
+        Restart entire program
+        """
+        os.execl(sys.executable, sys.executable, *sys.argv)
 
 
 
