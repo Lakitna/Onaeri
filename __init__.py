@@ -8,7 +8,7 @@ __version__ = '0.2.0'
 
 from .logger import *
 
-log("Onaeri API v%s" % __version__, end="\n\n")
+log("Onaeri API v%s" % __version__)
 
 from .cycle import Cycle
 from .timekeeper import TimeKeeper

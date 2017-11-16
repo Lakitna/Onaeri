@@ -15,7 +15,8 @@ class Cycle:
     Cycle a group of lamps
     """
     def __init__(self, name, devices):
-        log()
+        log("Setting up cycle named %s: " % name, end="", flush=True)
+
         self.name = name
         self._devices = devices
         self.settings = settings.get( self.name )
@@ -30,6 +31,8 @@ class Cycle:
         self._deviation = Deviation( self.settings )
         self.lamp = Lamp()
         self.prevLamp = Lamp()
+
+        logSuccess("Done")
 
 
     def tick(self, timeKeeper, lampData):

@@ -13,9 +13,6 @@ class Lookup:
     Calculates and dispenses lookup tables for lamp values
     """
     def __init__(self, config):
-        cycleName = config.__name__.split(".")[2]
-        log("Building lookup table for %s: " % cycleName, end="", flush=True)
-
         timeKeeper = TimeKeeper();
         self.config = config
         self.lamp = Lamp()
@@ -47,7 +44,6 @@ class Lookup:
         self.brightness = self._buildTable(brightnessData, self.config.briCorrect)
         self.color = self._buildTable(colorData, self.config.colorCorrect)
 
-        logSuccess("Done")
         # log(self.brightness)
         # log()
         # log(self.color)

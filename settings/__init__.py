@@ -49,7 +49,6 @@ def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
 
 
 
-log("Validating global settings: ", end='', flush=True)
 _checkIntegrity(Global.minPerTimeCode, check="unsigned")
 _checkIntegrity(Global.transitionTime, check="unsigned")
 _checkIntegrity(Global.totalDataPoints, check="unsigned")
@@ -67,7 +66,6 @@ _checkIntegrity(data.colorData['night'], 0, 100)
 _checkIntegrity(data.colorData['morning'], 0, 100)
 _checkIntegrity(data.colorData['evening'], 0, 100)
 _checkIntegrity(data.deviationData, 0, 100)
-logSuccess("Done")
 
 
 
@@ -121,8 +119,6 @@ def integrityValidation(userSettings):
     """
     Check integrity of settings
     """
-    cycleName = userSettings.__name__.split(".")[2]
-    log("Validating user settings for %s: " % cycleName, end='', flush=True)
     _checkIntegrity(userSettings.userAlarmTime, check="time")
     _checkIntegrity(userSettings.userAlarmOffset, check="unsigned")
     _checkIntegrity(userSettings.userSleepTime, check="time")
@@ -134,4 +130,3 @@ def integrityValidation(userSettings):
     _checkIntegrity(userSettings.deviationDuration, check="unsigned")
     _checkIntegrity(userSettings.automaticPowerOff, check="boolean")
     _checkIntegrity(userSettings.automaticPowerOn, check="boolean")
-    logSuccess("Done")
