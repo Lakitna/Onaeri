@@ -1,11 +1,3 @@
-def printError(string, end="\n", flush=False):
-    print("\033[7;31m %s \033[0;0m" % string, end=end, flush=flush)
-def printWarning(string, end="\n", flush=False):
-    print("\033[1;34m%s\033[0;0m" % string, end=end, flush=flush)
-def printDone():
-    print("\033[7;32m%s\033[0;0m" % " Done ")
-
-
 def scale(val, inRange, outRange, decimals=1):
     """
     Scale the given value from one scale to another

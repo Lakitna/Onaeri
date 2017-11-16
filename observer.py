@@ -2,6 +2,7 @@ from .lamp import Lamp
 import sys
 from .helper import limitTo
 from .data import briRange, colorRange
+from .logger import *
 
 
 class Observer:
@@ -59,8 +60,8 @@ class Observer:
         for i in range(len(new)):
             lamp = new[i]
             if not prev == lamp:
-                print("\033[1;36m[Observer] Illegal change detected:")
-                print("\t%s: %s\033[0;0m" % (self._cycleName, lamp))
+                logHighlight("[Observer] Illegal change detected:")
+                logHighlight("\t%s: %s" % (self._cycleName, lamp))
                 self.update = True
                 return lamp
         return new[0]

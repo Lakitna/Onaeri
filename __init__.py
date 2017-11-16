@@ -3,13 +3,12 @@ Onaeri API
 https://github.com/Lakitna/Onaeri
 """
 
-__version__ = '0.1.1'
+__version__ = '0.2.0'
 
 
-print("Onaeri API v%s" % __version__)
-print()
+from .logger import *
 
-
+log("Onaeri API v%s" % __version__, end="\n\n")
 
 from .cycle import Cycle
 from .timekeeper import TimeKeeper

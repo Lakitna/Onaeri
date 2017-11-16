@@ -13,7 +13,7 @@ mainLoopDelay = 1               # Time in seconds between main loops, unsigned f
 restartTime = (14, 55)          # Time of day where controller restarts
 
 settingFileExtention = '.py'    # Extention of settings file, String
-
+loggingFolder = 'log'
 
 ###############
 # Data tables #

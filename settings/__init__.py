@@ -1,8 +1,8 @@
 import os
 import importlib
 from . import Global
-from ..helper import printError, printWarning, printDone
 from .. import data
+from ..logger import *
 
 blacklist = ["Global", "Template", "__init__"]
 
@@ -13,7 +13,7 @@ def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
     """
     def _ruling(v, rnge):
         if not rnge[0] <= v <= rnge[1]:
-            printError("Invalid setting. '%s' is not in allowed range (%s - %s)." % (val, rnge[0], rnge[1]))
+            logError("Invalid setting. '%s' is not in allowed range (%s - %s)." % (val, rnge[0], rnge[1]))
             exit()
 
 
@@ -26,17 +26,17 @@ def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
 
     elif check is "unsigned":
         if not val >= 0:
-            printError("Invalid setting. '%s' is not in allowed range (%s - ∞)." % (val, rmin))
+            logError("Invalid setting. '%s' is not in allowed range (%s - ∞)." % (val, rmin))
             exit()
 
     elif check is "string":
         if not type(val) is str:
-            printError("Invalid setting. '%s' is not a string." % (val))
+            logError("Invalid setting. '%s' is not a string." % (val))
             exit()
 
     elif check is "boolean":
         if not type(val) is bool:
-            printError("Invalid setting. '%s' is not boolean." % (val))
+            logError("Invalid setting. '%s' is not boolean." % (val))
             exit()
 
     elif check is "time":
@@ -44,12 +44,12 @@ def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
         _ruling(val[1], (0, 59))
 
     else:
-        printError("Check `%s` could not be performed." % check)
+        logError("Check `%s` could not be performed." % check)
         exit()
 
 
 
-print("Validating global settings: ", end='', flush=True)
+log("Validating global settings: ", end='', flush=True)
 _checkIntegrity(Global.minPerTimeCode, check="unsigned")
 _checkIntegrity(Global.transitionTime, check="unsigned")
 _checkIntegrity(Global.totalDataPoints, check="unsigned")
@@ -67,7 +67,7 @@ _checkIntegrity(data.colorData['night'], 0, 100)
 _checkIntegrity(data.colorData['morning'], 0, 100)
 _checkIntegrity(data.colorData['evening'], 0, 100)
 _checkIntegrity(data.deviationData, 0, 100)
-printDone()
+logSuccess("Done")
 
 
 
@@ -88,7 +88,7 @@ def _settingFileList():
 
 cycles = _settingFileList();
 if len(cycles) == 0:
-    printError("No setting files found. Please create a file in the `settings` folder using the Template.py.")
+    logError("No setting files found. Please create a file in the `settings` folder using the Template.py.")
     exit()
 
 
@@ -99,7 +99,7 @@ def get(settingFile=""):
     Return a setting file
     """
     if not settingFile in cycles:
-        printError("Setting file %s not found" % settingFile)
+        logError("Setting file %s not found" % settingFile)
         exit()
 
     userSettings = importlib.import_module(__name__+"."+settingFile, package=None)
@@ -122,7 +122,7 @@ def integrityValidation(userSettings):
     Check integrity of settings
     """
     cycleName = userSettings.__name__.split(".")[2]
-    print("Validating user settings for %s: " % cycleName, end='', flush=True)
+    log("Validating user settings for %s: " % cycleName, end='', flush=True)
     _checkIntegrity(userSettings.userAlarmTime, check="time")
     _checkIntegrity(userSettings.userAlarmOffset, check="unsigned")
     _checkIntegrity(userSettings.userSleepTime, check="time")
@@ -134,4 +134,4 @@ def integrityValidation(userSettings):
     _checkIntegrity(userSettings.deviationDuration, check="unsigned")
     _checkIntegrity(userSettings.automaticPowerOff, check="boolean")
     _checkIntegrity(userSettings.automaticPowerOn, check="boolean")
-    printDone()
+    logSuccess("Done")

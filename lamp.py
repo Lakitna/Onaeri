@@ -1,5 +1,6 @@
-from .helper import printWarning, inRange
+from .helper import inRange
 from .data import briRange, colorRange
+from .logger import *
 
 
 class Lamp:
@@ -81,7 +82,7 @@ class Lamp:
         if value == None or value == True or value == False:
             self._power = value
         else:
-            printWarning("[Lamp] Power input value error. Allowed values 'True', 'False' or 'None'.")
+            logWarn("[Lamp] Power input value error. Allowed values 'True', 'False' or 'None'.")
 
 
     @property
@@ -93,7 +94,7 @@ class Lamp:
         if inRange(value, briRange):
             self._brightness = value
         else:
-            printWarning("[Lamp] Brightness input value error. %d given, allowed range %s" % (value, str(briRange)))
+            logWarn("[Lamp] Brightness input value error. %d given, allowed range %s" % (value, str(briRange)))
 
 
     @property
@@ -105,7 +106,7 @@ class Lamp:
         if inRange(value, colorRange):
             self._color = value
         else:
-            printWarning("[Lamp] Color input value error. %d given, allowed range %s" % (value, str(colorRange)))
+            logWarn("[Lamp] Color input value error. %d given, allowed range %s" % (value, str(colorRange)))
 
 
     @property

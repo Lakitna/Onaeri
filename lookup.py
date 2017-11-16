@@ -1,7 +1,8 @@
 from .timekeeper import TimeKeeper
 from .data import brightnessData, colorData, briRange, colorRange
-from .helper import printDone, scale, sequenceResize
+from .helper import scale, sequenceResize
 from .lamp import Lamp
+from .logger import *
 
 from . import settings
 import time
@@ -13,7 +14,7 @@ class Lookup:
     """
     def __init__(self, config):
         cycleName = config.__name__.split(".")[2]
-        print("Building lookup table for %s: " % cycleName, end="", flush=True)
+        log("Building lookup table for %s: " % cycleName, end="", flush=True)
 
         timeKeeper = TimeKeeper();
         self.config = config
@@ -46,10 +47,10 @@ class Lookup:
         self.brightness = self._buildTable(brightnessData, self.config.briCorrect)
         self.color = self._buildTable(colorData, self.config.colorCorrect)
 
-        printDone()
-        # print(self.brightness)
-        # print()
-        # print(self.color)
+        logSuccess("Done")
+        # log(self.brightness)
+        # log()
+        # log(self.color)
         # exit()
 
 
@@ -86,23 +87,23 @@ class Lookup:
         for timeCode in range(self._userMorningSlope[0], self._userMorningSlope[1]):
             table[timeCode] = source['morning'][timeCode - self._userMorningSlope[0]]
             table[timeCode] = scale(table[timeCode], (0,100), sourceRange)
-            # print("morning %s > %s" % (timeCode, table[timeCode]))
+            # log("morning %s > %s" % (timeCode, table[timeCode]))
 
 
         for timeCode in range(self._userEveningSlope[0], self._userEveningSlope[1]):
             table[timeCode] = source['evening'][timeCode - self._userEveningSlope[0]]
             table[timeCode] = scale(table[timeCode], (0,100), sourceRange)
-            # print("evening %s > %s" % (timeCode, table[timeCode]))
+            # log("evening %s > %s" % (timeCode, table[timeCode]))
 
         for timeCode in range(self._userEveningSlope[2], self._userEveningSlope[3]):
             table[timeCode] = source['evening'][timeCode - self._userEveningSlope[2]]
             table[timeCode] = scale(table[timeCode], (0,100), sourceRange)
-            # print("evening %s > %s" % (timeCode, table[timeCode]))
+            # log("evening %s > %s" % (timeCode, table[timeCode]))
 
 
         for timeCode in range(self._userMorningSlope[1], self._userEveningSlope[2]):
             table[timeCode] = scale(source['day'], (0,100), sourceRange)
-            # print("day %s > %s" % (timeCode, table[timeCode]))
+            # log("day %s > %s" % (timeCode, table[timeCode]))
 
 
         return table
