@@ -1,3 +1,12 @@
+import os, sys
+
+def programRestart(self):
+    """
+    Restart entire program
+    """
+    os.execl(sys.executable, sys.executable, *sys.argv)
+
+
 def scale(val, inRange, outRange, decimals=1):
     """
     Scale the given value from one scale to another
