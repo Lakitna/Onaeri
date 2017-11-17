@@ -11,7 +11,6 @@ class Lamp:
         self._brightness = brightness
         self._color = color
         self._power = power
-
         self._name = name
 
 
@@ -43,7 +42,6 @@ class Lamp:
         if not self._brightness == other._brightness:  ret = False
         if not self._color == other._color:  ret = False
         if not self._power == other._power:  ret = False
-
         return ret
 
 
@@ -69,7 +67,6 @@ class Lamp:
         for var in self.__dict__:
             if not getattr(self, var) == None:
                 empty = False
-
         return empty
 
 

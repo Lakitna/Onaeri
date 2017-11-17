@@ -38,7 +38,7 @@ class Onaeri:
 
         for cycle in self.cycles:
             if lampDataList == None:
-                lampData=None
+                lampData = None
             else:
                 lampData = []
                 for lamp in lampDataList:

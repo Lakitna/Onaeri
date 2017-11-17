@@ -4,6 +4,7 @@ from . import Global
 from .. import data
 from ..logger import *
 
+
 blacklist = ["Global", "Template", "__init__"]
 
 
@@ -16,33 +17,27 @@ def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
             logError("Invalid setting. '%s' is not in allowed range (%s - %s)." % (val, rnge[0], rnge[1]))
             exit()
 
-
     if check is None:
         if type(val) is list or type(val) is tuple:
             for v in val:
                 _ruling(v, (rmin, rmax))
         else:
             _ruling(val, (rmin, rmax))
-
     elif check is "unsigned":
         if not val >= 0:
             logError("Invalid setting. '%s' is not in allowed range (%s - ∞)." % (val, rmin))
             exit()
-
     elif check is "string":
         if not type(val) is str:
             logError("Invalid setting. '%s' is not a string." % (val))
             exit()
-
     elif check is "boolean":
         if not type(val) is bool:
             logError("Invalid setting. '%s' is not boolean." % (val))
             exit()
-
     elif check is "time":
         _ruling(val[0], (0, 23))
         _ruling(val[1], (0, 59))
-
     else:
         logError("Check `%s` could not be performed." % check)
         exit()
@@ -69,8 +64,6 @@ _checkIntegrity(data.deviationData, 0, 100)
 
 
 
-
-
 def _settingFileList():
     """
     Get list of setting files from settings folder.
@@ -84,12 +77,11 @@ def _settingFileList():
                 ret.append( f )
     return ret
 
+
 cycles = _settingFileList();
 if len(cycles) == 0:
     logError("No setting files found. Please create a file in the `settings` folder using the Template.py.")
     exit()
-
-
 
 
 def get(settingFile=""):
@@ -107,12 +99,9 @@ def get(settingFile=""):
     userSettings.morningSlopeDuration = round(userSettings.morningSlopeDuration // Global.minPerTimeCode)
     userSettings.deviationDuration = round(userSettings.deviationDuration // Global.minPerTimeCode)
 
-    # Make sure all settings are within expectations
     integrityValidation(userSettings)
 
     return userSettings
-
-
 
 
 def integrityValidation(userSettings):

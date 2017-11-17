@@ -3,19 +3,6 @@ import time
 
 _loggingFolder = 'log'
 
-# Check if logging folder exists and create if it doesn't
-folderPath = '%s/%s' % (path.dirname(path.abspath(__file__)), _loggingFolder)
-if not path.exists(folderPath):
-    makedirs(folderPath)
-
-# Check if log file exists and create if it doesn't
-fileName = time.strftime("%d-%m-%Y.log")
-filePath = "%s/%s" % (folderPath, fileName)
-if not path.isfile(filePath) or not path.getsize(filePath) > 0:
-    with open(filePath, 'w') as f:
-        f.write("Log opened on %s\n" % time.strftime("%d-%m-%Y @ %H:%M"))
-
-
 def log(string="", end="\n", flush=False):
     """
     Log and print a message
@@ -68,6 +55,19 @@ def _writeToFile(string):
     """
     with open(filePath, 'a') as f:
         f.write(string)
+
+
+# Check if logging folder exists and create if it doesn't
+folderPath = '%s/%s' % (path.dirname(path.abspath(__file__)), _loggingFolder)
+if not path.exists(folderPath):
+    makedirs(folderPath)
+
+# Check if log file exists and create if it doesn't
+fileName = time.strftime("%d-%m-%Y.log")
+filePath = "%s/%s" % (folderPath, fileName)
+if not path.isfile(filePath) or not path.getsize(filePath) > 0:
+    with open(filePath, 'w') as f:
+        f.write("Log opened on %s\n" % time.strftime("%d-%m-%Y @ %H:%M"))
 
 _writeToFile("\n\n\n\n\nProgram started\n")
 _writeToFile("--------------------------------------------------\n")

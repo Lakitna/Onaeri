@@ -26,7 +26,6 @@ class Observer:
 
         # If observer recieved meaningfull data
         if not newData == None:
-
             self.turnedOn = False
             for i in range(len(newData)):
                 if self.data.power == False and newData[i].power == True:
@@ -35,12 +34,10 @@ class Observer:
                 newData[i].color = limitTo(newData[i].color, colorRange)
                 newData[i].brightness = limitTo(newData[i].brightness, briRange)
 
-
             if not self._legalChange:
                 self.data = self._sameData(newData, self.data)
             else:
                 self.data = newData[0]
-
 
             self._legalChange = False
 

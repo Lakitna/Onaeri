@@ -93,7 +93,6 @@ class Cycle:
         return lamp
 
 
-
     def _lampNameToIds(self, name):
         """
         Get lamp ids (plural) based on a partial device name.
