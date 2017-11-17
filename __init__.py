@@ -20,7 +20,7 @@ class Onaeri:
     """
     Onaeri API wrapper
     """
-    def __init__(self, settings, devices):
+    def __init__(self, devices):
         self.time = TimeKeeper()
         self.cycles = []
         self.update = False
