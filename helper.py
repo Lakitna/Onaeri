@@ -1,6 +1,6 @@
 import os, sys
 
-def programRestart(self):
+def programRestart():
     """
     Restart entire program
     """
