@@ -1,7 +1,7 @@
 from os import path, makedirs
 import time
+from . import settings
 
-_loggingFolder = 'log'
 
 def log(string="", end="\n", flush=False):
     """
@@ -57,8 +57,22 @@ def _writeToFile(string):
         f.write(string)
 
 
+def summary(values):
+    log("\n\nRUNTIME SUMMARY")
+    log("--------------------------------------------------")
+    for key in values:
+        if type(values[key]) is dict:
+            log("%s:" % key)
+            for subkey in values[key]:
+                log("\t%s:\t\t%s" % (subkey, values[key][subkey]))
+        else:
+            log("%s:\t\t%s" % (key, values[key]))
+    log()
+    _writeToFile("\n\n\n\n\n")
+
+
 # Check if logging folder exists and create if it doesn't
-folderPath = '%s/%s' % (path.dirname(path.abspath(__file__)), _loggingFolder)
+folderPath = '%s/%s' % (path.dirname(path.abspath(__file__)), settings.Global.loggingFolder)
 if not path.exists(folderPath):
     makedirs(folderPath)
 
@@ -69,5 +83,5 @@ if not path.isfile(filePath) or not path.getsize(filePath) > 0:
     with open(filePath, 'w') as f:
         f.write("Log opened on %s\n" % time.strftime("%d-%m-%Y @ %H:%M"))
 
-_writeToFile("\n\n\n\n\nProgram started\n")
+_writeToFile("\nProgram started\n")
 _writeToFile("--------------------------------------------------\n")
