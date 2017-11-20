@@ -11,6 +11,7 @@ class TimeKeeper:
         self._minPerTimeCode = settings.Global.minPerTimeCode
         self.timeCode = self.makeCode()
         self.update = True
+        self.runtime = 0
 
 
     def tick(self):
@@ -21,9 +22,10 @@ class TimeKeeper:
             self.update = False
         else:
             self.update = True
+            self.runtime += 1
 
 
-    def makeCode(self, h=None, m=None, s=None):
+    def makeCode(self, h=None, m=None, s=None, dry=False):
         """
         Calculate a new timecode
         """
@@ -41,8 +43,9 @@ class TimeKeeper:
             if len(h) > 1:  m = h[1]
             h = h[0]
 
-        self.timeCode = math.floor( ( (h*60) + m + (s/60) ) // self._minPerTimeCode )
-        return self.timeCode
+        ret = math.floor( ( (h*60) + m + (s/60) ) // self._minPerTimeCode )
+        if not dry:  self.timeCode = ret
+        return ret
 
 
     @property
