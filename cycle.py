@@ -1,7 +1,7 @@
 import time
 from .timekeeper import TimeKeeper
 from .lookup import Lookup
-from .helper import sequenceResize, inRange, limitTo, programRestart
+from .helper import sequenceResize, inRange, limitTo
 from .data import deviationData
 from .observer import Observer
 from .lamp import Lamp
@@ -21,9 +21,6 @@ class Cycle:
         self.settings = settings.get( self.name )
         self.group = self._lampNameToIds( self.name )
         self.update = False
-
-        self._runTime = 0
-        self._resetTime = TimeKeeper().makeCode(settings.Global.restartTime)
 
         self.lookup = Lookup( self.settings )
         self.observer = Observer( self.group, name )
@@ -58,11 +55,6 @@ class Cycle:
                 self.lamp = self._compareWithPrevious( newVals )
 
             self.prevLamp.copy(newVals)
-
-
-            if timeKeeper.timeCode == self._resetTime and self._runTime > 10:
-                programRestart()
-            if timeKeeper.update:  self._runTime += 1
 
         return self.update
 

@@ -12,8 +12,6 @@ mainLoopDelay = 1               # Time in seconds between main loops, unsigned f
 
 valRange      = (0, 1000)       # Range of api values
 
-restartTime   = (3, 0)          # Time of day where controller restarts
-
 settingFileExtention = '.py'    # Extention of settings file, String
 loggingFolder = 'log'
 
