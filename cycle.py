@@ -2,7 +2,7 @@ import time
 from .timekeeper import TimeKeeper
 from .lookup import Lookup
 from .helper import sequenceResize, inRange, limitTo, programRestart
-from .data import deviationData, briRange, colorRange
+from .data import deviationData
 from .observer import Observer
 from .lamp import Lamp
 from . import settings
@@ -162,11 +162,11 @@ class Deviation:
 
             newVals.brightness = limitTo(
                                     newVals.brightness + self.values['brightness'],
-                                    briRange
+                                    settings.Global.valRange
                                 );
             newVals.color = limitTo(
                                     newVals.color + self.values['color'],
-                                    colorRange
+                                    settings.Global.valRange
                                 );
             self.counter += 1
 

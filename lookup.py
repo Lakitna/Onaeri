@@ -1,5 +1,5 @@
 from .timekeeper import TimeKeeper
-from .data import brightnessData, colorData, briRange, colorRange
+from .data import brightnessData, colorData
 from .helper import scale, sequenceResize
 from .lamp import Lamp
 from .logger import *
@@ -52,8 +52,8 @@ class Lookup:
         """
         Get lamp values associated with timecode. Returns lamp object
         """
-        self.lamp.brightness = scale(self.brightness[timeCode], (0,100), briRange, decimals=0)
-        self.lamp.color      = scale(self.color[timeCode], (0,100), colorRange, decimals=0)
+        self.lamp.brightness = scale(self.brightness[timeCode], (0,100), settings.Global.valRange)
+        self.lamp.color      = scale(self.color[timeCode], (0,100), settings.Global.valRange)
 
         if timeCode == (self._userAlarmTime - self._userAlarmOffset):
             self.lamp.power = True
@@ -79,14 +79,14 @@ class Lookup:
 
         for timeCode in range(self._userMorningSlope[0], self._userMorningSlope[1]):
             table[timeCode] = source['morning'][timeCode - self._userMorningSlope[0]]
-            table[timeCode] = scale(table[timeCode], (0,100), sourceRange)
+            table[timeCode] = scale(table[timeCode], (0,100), sourceRange, decimals=1)
 
         for timeCode in range(self._userEveningSlope[0], self._userEveningSlope[1]):
             table[timeCode] = source['evening'][timeCode - self._userEveningSlope[0]]
-            table[timeCode] = scale(table[timeCode], (0,100), sourceRange)
+            table[timeCode] = scale(table[timeCode], (0,100), sourceRange, decimals=1)
         for timeCode in range(self._userEveningSlope[2], self._userEveningSlope[3]):
             table[timeCode] = source['evening'][timeCode - self._userEveningSlope[2]]
-            table[timeCode] = scale(table[timeCode], (0,100), sourceRange)
+            table[timeCode] = scale(table[timeCode], (0,100), sourceRange, decimals=1)
 
         for timeCode in range(self._userMorningSlope[1], self._userEveningSlope[2]):
             table[timeCode] = scale(source['day'], (0,100), sourceRange)

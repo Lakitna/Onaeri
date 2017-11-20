@@ -1,6 +1,6 @@
 from .helper import inRange
-from .data import briRange, colorRange
 from .logger import *
+from .settings.Global import valRange
 
 
 class Lamp:
@@ -88,10 +88,12 @@ class Lamp:
 
     @brightness.setter
     def brightness(self, value):
-        if inRange(value, briRange):
+        if value is None:
+            self._brightness = None
+        elif inRange(value, valRange):
             self._brightness = value
         else:
-            logWarn("[Lamp] Brightness input value error. %d given, allowed range %s" % (value, str(briRange)))
+            logWarn("[Lamp] Brightness input value error. %d given, allowed range %s" % (value, str(valRange)))
 
 
     @property
@@ -100,10 +102,12 @@ class Lamp:
 
     @color.setter
     def color(self, value):
-        if inRange(value, colorRange):
+        if value is None:
+            self._color = None
+        elif inRange(value, valRange):
             self._color = value
         else:
-            logWarn("[Lamp] Color input value error. %d given, allowed range %s" % (value, str(colorRange)))
+            logWarn("[Lamp] Color input value error. %d given, allowed range %s" % (value, str(valRange)))
 
 
     @property

@@ -1,8 +1,8 @@
 from .lamp import Lamp
 import sys
 from .helper import limitTo
-from .data import briRange, colorRange
 from .logger import *
+from .settings.Global import valRange
 
 
 class Observer:
@@ -31,8 +31,8 @@ class Observer:
                 if self.data.power == False and newData[i].power == True:
                     self.turnedOn = True
 
-                newData[i].color = limitTo(newData[i].color, colorRange)
-                newData[i].brightness = limitTo(newData[i].brightness, briRange)
+                newData[i].color = limitTo(newData[i].color, valRange)
+                newData[i].brightness = limitTo(newData[i].brightness, valRange)
 
             if not self._legalChange:
                 self.data = self._sameData(newData, self.data)
