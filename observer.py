@@ -1,7 +1,8 @@
 from .lamp import Lamp
 import sys
 from .helper import limitTo
-from .data import briRange, colorRange
+from .logger import *
+from .settings.Global import valRange
 
 
 class Observer:
@@ -25,21 +26,18 @@ class Observer:
 
         # If observer recieved meaningfull data
         if not newData == None:
-
             self.turnedOn = False
             for i in range(len(newData)):
                 if self.data.power == False and newData[i].power == True:
                     self.turnedOn = True
 
-                newData[i].color = limitTo(newData[i].color, colorRange)
-                newData[i].brightness = limitTo(newData[i].brightness, briRange)
-
+                newData[i].color = limitTo(newData[i].color, valRange)
+                newData[i].brightness = limitTo(newData[i].brightness, valRange)
 
             if not self._legalChange:
                 self.data = self._sameData(newData, self.data)
             else:
                 self.data = newData[0]
-
 
             self._legalChange = False
 
@@ -59,8 +57,8 @@ class Observer:
         for i in range(len(new)):
             lamp = new[i]
             if not prev == lamp:
-                print("\033[1;36m[Observer] Illegal change detected:")
-                print("\t%s: %s\033[0;0m" % (self._cycleName, lamp))
+                logHighlight("[Observer] Illegal change detected:")
+                logHighlight("\t%s: %s" % (self._cycleName, lamp))
                 self.update = True
                 return lamp
         return new[0]

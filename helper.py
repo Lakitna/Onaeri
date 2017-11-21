@@ -1,15 +1,9 @@
-def printError(string, end="\n", flush=False):
-    print("\033[7;31m %s \033[0;0m" % string, end=end, flush=flush)
-def printWarning(string, end="\n", flush=False):
-    print("\033[1;34m%s\033[0;0m" % string, end=end, flush=flush)
-def printDone():
-    print("\033[7;32m%s\033[0;0m" % " Done ")
-
-
-def scale(val, inRange, outRange, decimals=1):
+def scale(val, inRange, outRange, decimals=0):
     """
     Scale the given value from one scale to another
     """
+    if val is None:  return None
+
     ret = ( (val - inRange[0]) \
             / (inRange[1] - inRange[0]) ) \
             * (outRange[1] - outRange[0]) \
@@ -44,6 +38,7 @@ def limitTo(val, rnge):
     """
     Limit input value to a given absolute range
     """
+    if val is None:  return None
     if val < rnge[0]:  val = rnge[0]
     if val > rnge[1]:  val = rnge[1]
     return val
@@ -53,6 +48,7 @@ def inRange(val, rnge):
     """
     Find out if input value is within a given absolute range
     """
+    if val is None:  return False
     if rnge[0] <= val <= rnge[1]:
         return True
     return False

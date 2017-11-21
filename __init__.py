@@ -3,13 +3,12 @@ Onaeri API
 https://github.com/Lakitna/Onaeri
 """
 
-__version__ = '0.1.1'
+__version__ = '0.2.0'
 
 
-print("Onaeri API v%s" % __version__)
-print()
+from .logger import *
 
-
+log("Onaeri API v%s" % __version__)
 
 from .cycle import Cycle
 from .timekeeper import TimeKeeper
@@ -21,7 +20,7 @@ class Onaeri:
     """
     Onaeri API wrapper
     """
-    def __init__(self, settings, devices):
+    def __init__(self, devices):
         self.time = TimeKeeper()
         self.cycles = []
         self.update = False
@@ -39,7 +38,7 @@ class Onaeri:
 
         for cycle in self.cycles:
             if lampDataList == None:
-                lampData=None
+                lampData = None
             else:
                 lampData = []
                 for lamp in lampDataList:

@@ -1,5 +1,6 @@
-from .helper import printWarning, inRange
-from .data import briRange, colorRange
+from .helper import inRange
+from .logger import *
+from .settings.Global import valRange
 
 
 class Lamp:
@@ -10,7 +11,6 @@ class Lamp:
         self._brightness = brightness
         self._color = color
         self._power = power
-
         self._name = name
 
 
@@ -42,7 +42,6 @@ class Lamp:
         if not self._brightness == other._brightness:  ret = False
         if not self._color == other._color:  ret = False
         if not self._power == other._power:  ret = False
-
         return ret
 
 
@@ -68,7 +67,6 @@ class Lamp:
         for var in self.__dict__:
             if not getattr(self, var) == None:
                 empty = False
-
         return empty
 
 
@@ -81,7 +79,7 @@ class Lamp:
         if value == None or value == True or value == False:
             self._power = value
         else:
-            printWarning("[Lamp] Power input value error. Allowed values 'True', 'False' or 'None'.")
+            logWarn("[Lamp] Power input value error. Allowed values 'True', 'False' or 'None'.")
 
 
     @property
@@ -90,10 +88,12 @@ class Lamp:
 
     @brightness.setter
     def brightness(self, value):
-        if inRange(value, briRange):
+        if value is None:
+            self._brightness = None
+        elif inRange(value, valRange):
             self._brightness = value
         else:
-            printWarning("[Lamp] Brightness input value error. %d given, allowed range %s" % (value, str(briRange)))
+            logWarn("[Lamp] Brightness input value error. %d given, allowed range %s" % (value, str(valRange)))
 
 
     @property
@@ -102,10 +102,12 @@ class Lamp:
 
     @color.setter
     def color(self, value):
-        if inRange(value, colorRange):
+        if value is None:
+            self._color = None
+        elif inRange(value, valRange):
             self._color = value
         else:
-            printWarning("[Lamp] Color input value error. %d given, allowed range %s" % (value, str(colorRange)))
+            logWarn("[Lamp] Color input value error. %d given, allowed range %s" % (value, str(valRange)))
 
 
     @property

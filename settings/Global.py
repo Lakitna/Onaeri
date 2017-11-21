@@ -10,8 +10,10 @@ transitionTime = 1              # Lamp transition time in seconds, unsigned floa
 commandsTries = 3               # Amount of times to try sending a command, unsigned int
 mainLoopDelay = 1               # Time in seconds between main loops, unsigned float
 
-settingFileExtention = '.py'    # Extention of settings file, String
+valRange      = (0, 1000)       # Range of api values
 
+settingFileExtention = '.py'    # Extention of settings file, String
+loggingFolder = 'log'
 
 ###############
 # Data tables #
