@@ -1,6 +1,6 @@
 from .timekeeper import TimeKeeper
 from .data import brightnessData, colorData
-from .helper import scale, sequenceResize
+from .helper import scale, sequenceResize, inRange
 from .lamp import Lamp
 from .logger import *
 
@@ -13,16 +13,17 @@ class Lookup:
     Calculates and dispenses lookup tables for lamp values
     """
     def __init__(self, config):
-        timeKeeper = TimeKeeper();
+        self.timeKeeper = TimeKeeper();
         self.config = config
         self.lamp = Lamp()
+        self.isNight = False
 
         # Sleep rhythm settings
-        self._userAlarmTime =    timeKeeper.makeCode(self.config.userAlarmTime)
-        self._userAlarmOffset =  timeKeeper.makeCode(m=self.config.userAlarmOffset)
+        self._userAlarmTime =    self.timeKeeper.makeCode(self.config.userAlarmTime)
+        self._userAlarmOffset =  self.timeKeeper.makeCode(m=self.config.userAlarmOffset)
 
-        self._userSleepTime =    timeKeeper.makeCode(self.config.userSleepTime)
-        self._userWindDownTime = timeKeeper.makeCode(m=self.config.userWindDownTime)
+        self._userSleepTime =    self.timeKeeper.makeCode(self.config.userSleepTime)
+        self._userWindDownTime = self.timeKeeper.makeCode(m=self.config.userWindDownTime)
 
         # Create morning and evening slopes based on sleep rhythm settings
         self._userMorningSlope = [0,0]
@@ -62,8 +63,25 @@ class Lookup:
         else:
             self.lamp.power = None
 
+        if timeCode == (self._userSleepTime - self._userWindDownTime):
+            self.lamp.mode = 'dark'
+        else:
+            self.lamp.mode = None
+
+        self.isNight = self._isNight(timeCode)
+
         return self.lamp
 
+
+    def _isNight(self, timeCode=None):
+        if timeCode is None:
+            timeCode = self.timeKeeper.makeCode()
+
+        if timeCode in range((self._userSleepTime - self._userWindDownTime), settings.Global.totalDataPoints):
+            return True
+        if timeCode in range(0, (self._userAlarmTime - self._userAlarmOffset)):
+            return True
+        return False
 
 
     def _buildTable(self, source, sourceRange):

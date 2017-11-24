@@ -23,7 +23,7 @@ class Cycle:
         self.update = False
 
         self.lookup = Lookup( self.settings )
-        self.observer = Observer( self.group, name )
+        self.observer = Observer( self.group, name, self.lookup )
         self._deviation = Deviation( self.settings )
         self.lamp = Lamp()
         self.prevLamp = Lamp()
@@ -44,8 +44,17 @@ class Cycle:
             if self.observer.update:
                 self._deviation.change(newVals, self.observer.data)
 
-            if self.observer.turnedOn:
+            # If observer dictates all lamps to go off
+            if self.observer.turnOff:
+                self.lamp.power = False
+                self.update = True
+                self.observer.legalChange
+                self._deviation.reset()
+            # If observer saw that the lamps where turned on
+            elif self.observer.turnedOn:
                 self.lamp.copy(newVals)
+                if self.lookup.isNight:
+                    self.lamp.mode = 'dark'
                 self.lamp.power = None
                 self.update = True
                 self.observer.legalChange
@@ -65,7 +74,7 @@ class Cycle:
         """
         lamp = Lamp()
         # If the lamp is on and (value is not the same as previous update or observer dictates update) or lamp turns on
-        if self.observer.data.power and (not vals == self.prevLamp or self.observer.update) or vals.power:
+        if self.observer.data.power and (not vals == self.prevLamp or self.observer.update) or vals.power or vals.mode:
             if not vals.brightness == self.prevLamp.brightness:
                 lamp.brightness = vals.brightness
             if not vals.color == self.prevLamp.color:
@@ -78,6 +87,8 @@ class Cycle:
                     lamp.power = None
                 if not self.settings.automaticPowerOn and lamp.power == True:
                     lamp.power = None
+
+            lamp.mode = vals.mode
 
             self.update = True
             self.observer.legalChange

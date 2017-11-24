@@ -7,11 +7,12 @@ class Lamp:
     """
     Data structure for a lamp
     """
-    def __init__(self, brightness=None, color=None, power=None, name=None):
+    def __init__(self, brightness=None, color=None, power=None, name=None, mode=None):
         self._brightness = brightness
         self._color = color
         self._power = power
         self._name = name
+        self._mode = mode
 
 
     def __call__(self):
@@ -80,6 +81,15 @@ class Lamp:
             self._power = value
         else:
             logWarn("[Lamp] Power input value error. Allowed values 'True', 'False' or 'None'.")
+
+
+    @property
+    def mode(self):
+        return self._mode
+
+    @mode.setter
+    def mode(self, value):
+        self._mode = value
 
 
     @property
