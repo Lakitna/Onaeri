@@ -1,25 +1,39 @@
-# Alarm time (morning)
-userAlarmTime    = (9, 0)       # Time alarm is set in (hour, minute)
-userAlarmOffset  = 30           # Wakeup phase offset in minutes
-
-# Bed time (evening)
-userSleepTime    = (23, 30)     # Bedtime in (hour, minute)
-userWindDownTime = 30           # Wind down time before bed in minutes
-
-
-# Brightness and color tweaks
-briCorrect       = (0, 100)     # [min, max] brightness in %
-colorCorrect     = (0, 100)     # [min, max] color temp in %
+"""
+Basic settings
+"""
+# Time alarm is set in (hour, minute)
+userAlarmTime = (9, 0)
+# Bedtime in (hour, minute)
+userSleepTime = (23, 30)
 
 
-# Cycle anatomy settings
-morningSlopeDuration = 60       # Duration of morningslope in minutes
-eveningSlopeDuration = 500      # Duration of eveningslope in minutes
+# Allow the lamps to automatically go off in the evening.
+automaticPowerOff = True
+# Allow the lamps to automatically go on in the morning.
+automaticPowerOn  = True
 
 
-# How to treat the lamp
-automaticPowerOff = True        # Allow the controller to automatically turn the lamps off
-automaticPowerOn  = True        # Allow the controller to automatically turn the lamps on
+# Lamp brightness adjust in percentages.
+briCorrect   = (0, 100)
+# Lamp color adjust in percentages.
+colorCorrect = (0, 100)
 
 
-deviationDuration = 45          # Temporary cycle deviation duration in minutes
+# How many minutes before your alarm time should the lamps go on?
+userAlarmOffset  = 30
+# How many minutes before your bedtime should the lamps notify you?
+userWindDownTime = 30
+
+
+
+"""
+Advanced settings
+"""
+# Duration of morningslope in minutes
+morningSlopeDuration = 60
+
+# Duration of eveningslope in minutes
+eveningSlopeDuration = 500
+
+# Temporary cycle deviation duration in minutes
+deviationDuration = 45

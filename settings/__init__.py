@@ -98,23 +98,23 @@ def get(settingFile=""):
     userSettings.morningSlopeDuration = round(userSettings.morningSlopeDuration // Global.minPerTimeCode)
     userSettings.deviationDuration = round(userSettings.deviationDuration // Global.minPerTimeCode)
 
-    integrityValidation(userSettings)
+    userSettingsValidation(userSettings)
 
     return userSettings
 
 
-def integrityValidation(userSettings):
+def userSettingsValidation(settings):
     """
     Check integrity of settings
     """
-    _checkIntegrity(userSettings.userAlarmTime, check="time")
-    _checkIntegrity(userSettings.userAlarmOffset, check="unsigned")
-    _checkIntegrity(userSettings.userSleepTime, check="time")
-    _checkIntegrity(userSettings.userWindDownTime, check="unsigned")
-    _checkIntegrity(userSettings.briCorrect, 0, 100)
-    _checkIntegrity(userSettings.colorCorrect, 0, 100)
-    _checkIntegrity(userSettings.morningSlopeDuration, check="unsigned")
-    _checkIntegrity(userSettings.eveningSlopeDuration, check="unsigned")
-    _checkIntegrity(userSettings.deviationDuration, check="unsigned")
-    _checkIntegrity(userSettings.automaticPowerOff, check="boolean")
-    _checkIntegrity(userSettings.automaticPowerOn, check="boolean")
+    _checkIntegrity(settings.userAlarmTime, check="time")
+    _checkIntegrity(settings.userAlarmOffset, check="unsigned")
+    _checkIntegrity(settings.userSleepTime, check="time")
+    _checkIntegrity(settings.userWindDownTime, check="unsigned")
+    _checkIntegrity(settings.briCorrect, 0, 100)
+    _checkIntegrity(settings.colorCorrect, 0, 100)
+    _checkIntegrity(settings.morningSlopeDuration, check="unsigned")
+    _checkIntegrity(settings.eveningSlopeDuration, check="unsigned")
+    _checkIntegrity(settings.deviationDuration, check="unsigned")
+    _checkIntegrity(settings.automaticPowerOff, check="boolean")
+    _checkIntegrity(settings.automaticPowerOn, check="boolean")

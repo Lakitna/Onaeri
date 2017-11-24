@@ -1,22 +1,39 @@
-##################
-# Basic settings #
-##################
-transitionTime = 1              # Lamp transition time in seconds, unsigned float
+"""
+Basic settings
+"""
+# Duration of lamp transition in seconds, unsigned float.
+transitionTime = 1
+
+# Time the program rests between ticks in seconds, unsigned float.
+mainLoopDelay = 1
+
+# Minutes per timecode, unsigned float.
+minPerTimeCode = .5
+
+# Range of lamp values, int.
+valRange = (0, 1000)
 
 
-#####################
-# Advanced settings #
-#####################
-commandsTries = 3               # Amount of times to try sending a command, unsigned int
-mainLoopDelay = 1               # Time in seconds between main loops, unsigned float
 
-valRange      = (0, 1000)       # Range of api values
-
-settingFileExtention = '.py'    # Extention of settings file, String
+"""
+Logging settings
+"""
+# Folder where log files are stored. This doesn't have to an existing folder. String.
 loggingFolder = 'log'
 
-###############
-# Data tables #
-###############
-minPerTimeCode  = .5            # Minutes per datapoint, unsigned float
+# Extention of logging files, String.
+loggingExtention = '.log'
+
+
+
+"""
+Advanced settings
+"""
+# Amount of times to try sending a command before giving up, unsigned int.
+commandsTries = 3
+
+# Extention of settings file, String.
+settingFileExtention = '.py'
+
+# Total amount of timecodes in a day, calculated unsigned int.
 totalDataPoints = round((24*60) // minPerTimeCode)

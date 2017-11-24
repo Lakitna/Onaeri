@@ -58,7 +58,10 @@ def _writeToFile(string):
 
 
 def summary(values):
-    log("\n\nRUNTIME SUMMARY")
+    log("\n")
+    log("--------------------------------------------------")
+    log("RUNTIME SUMMARY")
+    log("Generated on %s" % time.strftime("%d-%m-%Y @ %H:%M"))
     log("--------------------------------------------------")
     for key in values:
         if type(values[key]) is dict:
@@ -77,8 +80,7 @@ if not path.exists(folderPath):
     makedirs(folderPath)
 
 # Check if log file exists and create if it doesn't
-fileName = time.strftime("%d-%m-%Y.log")
-filePath = "%s/%s" % (folderPath, fileName)
+filePath = "%s/%s%s" % (folderPath, time.strftime("%d-%m-%Y"), settings.Global.loggingExtention)
 if not path.isfile(filePath) or not path.getsize(filePath) > 0:
     with open(filePath, 'w') as f:
         f.write("Log opened on %s\n" % time.strftime("%d-%m-%Y @ %H:%M"))
