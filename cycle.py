@@ -140,8 +140,15 @@ class Deviation:
         # log(changeVals)
 
         if changeVals.power and self.duration > 0:
-            self.setValues['brightness'] = changeVals.brightness - dataVals.brightness
-            self.setValues['color'] = changeVals.color - dataVals.color
+            if changeVals.color is None:
+                self.setValues['color'] = dataVals.color
+            else:
+                self.setValues['color'] = changeVals.color - dataVals.color
+
+            if changeVals.brightness is None:
+                self.setValues['brightness'] = dataVals.brightness
+            else:
+                self.setValues['brightness'] = changeVals.brightness - dataVals.brightness
 
             self.values = self.setValues.copy()
 
