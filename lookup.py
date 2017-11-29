@@ -63,8 +63,9 @@ class Lookup:
         else:
             self.lamp.power = None
 
-        if timeCode == (self._userSleepTime - self._userWindDownTime):
-            self.lamp.mode = 'dark'
+        if timeCode in range((self._userSleepTime - self._userWindDownTime), settings.Global.totalDataPoints) or \
+           timeCode in range(0, (self._userAlarmTime - self._userAlarmOffset)):
+           self.lamp.mode = 'dark'
         else:
             self.lamp.mode = None
 

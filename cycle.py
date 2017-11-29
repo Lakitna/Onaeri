@@ -56,8 +56,6 @@ class Cycle:
             # If observer saw that the lamps where turned on
             elif self.observer.turnedOn:
                 self.lamp.copy(newVals)
-                if self.lookup.isNight and len(lampData) > 1:
-                    self.lamp.mode = 'dark'
                 self.lamp.power = None
                 self.update = True
                 self.observer.legalChange
