@@ -60,12 +60,14 @@ class Lamp:
         for var in self.__dict__:
             var = None
 
-    def isEmpty(self):
+    def isEmpty(self, varList=None):
         """
         Check if values in object are all None
         """
+        if varList is None:  varList = self.__dict__
+
         empty = True
-        for var in self.__dict__:
+        for var in varList:
             if not getattr(self, var) == None:
                 empty = False
         return empty
