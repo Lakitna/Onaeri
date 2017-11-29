@@ -16,17 +16,6 @@ valRange = (0, 1000)
 
 
 """
-Logging settings
-"""
-# Folder where log files are stored. This doesn't have to an existing folder. String.
-loggingFolder = 'log'
-
-# Extention of logging files, String.
-loggingExtention = '.log'
-
-
-
-"""
 Advanced settings
 """
 # Amount of times to try sending a command before giving up, unsigned int.
