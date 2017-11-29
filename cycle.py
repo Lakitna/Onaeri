@@ -74,8 +74,7 @@ class Cycle:
         Update lamp values (brightness & color)
         """
         lamp = Lamp()
-        # If the lamp is on and (value is not the same as previous update or observer dictates update) or lamp turns on
-        if (self.observer.data.power and (not vals == self.prevLamp or self.observer.update)) or vals.power or vals.mode:
+        if self._lampUpdate(vals):
             if not vals.brightness == self.prevLamp.brightness:
                 lamp.brightness = vals.brightness
             if not vals.color == self.prevLamp.color:
@@ -96,6 +95,26 @@ class Cycle:
 
         return lamp
 
+
+    def _lampUpdate(self, vals):
+        """
+        Define if the lamps should be updated.
+        Previously an if-statement, but it got very complex.
+        """
+        # If the lamp should be turned on according to Lookup
+        if vals.power:  return True
+
+        # If mode changes
+        if not vals.mode == self.prevLamp.mode:  return True
+
+        # If the lamp is currently on
+        if self.observer.data.power:
+            # If the new values are not the same as the old ones
+            if not vals == self.prevLamp:  return True
+            # If observer calls for an update
+            if self.observer.update:  return True
+
+        return False
 
 
 
