@@ -16,14 +16,17 @@ class Cycle:
     def __init__(self, name, devices):
         log("Setting up cycle named %s: " % name, end="", flush=True)
 
+        if len(devices) == 0:
+            logError("No lamps found with partial name `%s`." % name)
+            exit()
+        self.devices = devices
+
         self.name = name
-        self._devices = devices
         self.settings = settings.get( self.name )
-        self.group = self._lampNameToIds( self.name )
         self.update = False
 
         self.lookup = Lookup( self.settings )
-        self.observer = Observer( self.group, name, self.lookup )
+        self.observer = Observer( len(self.devices), name, self.lookup )
         self._deviation = Deviation( self.settings )
         self.lamp = Lamp()
         self.prevLamp = Lamp()
@@ -53,7 +56,7 @@ class Cycle:
             # If observer saw that the lamps where turned on
             elif self.observer.turnedOn:
                 self.lamp.copy(newVals)
-                if self.lookup.isNight:
+                if self.lookup.isNight and len(lampData) > 1:
                     self.lamp.mode = 'dark'
                 self.lamp.power = None
                 self.update = True
@@ -74,7 +77,7 @@ class Cycle:
         """
         lamp = Lamp()
         # If the lamp is on and (value is not the same as previous update or observer dictates update) or lamp turns on
-        if self.observer.data.power and (not vals == self.prevLamp or self.observer.update) or vals.power or vals.mode:
+        if (self.observer.data.power and (not vals == self.prevLamp or self.observer.update)) or vals.power or vals.mode:
             if not vals.brightness == self.prevLamp.brightness:
                 lamp.brightness = vals.brightness
             if not vals.color == self.prevLamp.color:
@@ -94,21 +97,6 @@ class Cycle:
             self.observer.legalChange
 
         return lamp
-
-
-    def _lampNameToIds(self, name):
-        """
-        Get lamp ids (plural) based on a partial device name.
-        """
-        ret = []
-        for i in range(len(self._devices)):
-            if name.lower() in self._devices[i].name.lower():
-                ret.append(i)
-
-        if len(ret) == 0:
-            ret = [0] # Default to lamp 0
-            logError("[Cycle] No lamps found with partial name `%s`. Use the Ikea Tradfri app to change the name of a lamp." % name)
-        return ret
 
 
 

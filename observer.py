@@ -10,7 +10,7 @@ class Observer:
     """
     Observe changes in a lamp
     """
-    def __init__(self, lampIds=[0], cycleName=None, lookup=None):
+    def __init__(self, lampCount, cycleName=None, lookup=None):
         self.update = True
         self.data = Lamp()
         self.turnedOn = False
@@ -19,7 +19,7 @@ class Observer:
         self._unpoweredLamps = []
         self._unpoweredLampsPrev = []
         self._cycleName = cycleName
-        self._lampIds = lampIds
+        self._lampCount = lampCount
         self._legalChange = True
 
     def look(self, newData):
@@ -40,7 +40,7 @@ class Observer:
                 if not newData[i].power:
                     self._unpoweredLamps.append(i)
                     newData[i] = self.data
-                    if len(self._unpoweredLamps) == len(self._lampIds):
+                    if len(self._unpoweredLamps) == self._lampCount:
                         self.data.power = False
 
 
@@ -80,7 +80,7 @@ class Observer:
             lamp = new[i]
 
             if not prev == lamp \
-              and (len(self._unpoweredLamps) == len(self._lampIds) or len(self._unpoweredLamps) == 0):
+              and (len(self._unpoweredLamps) == self._lampCount or len(self._unpoweredLamps) == 0):
                 logHighlight("[Observer] Illegal change detected:")
                 logHighlight("\t%s: %s" % (self._cycleName, lamp))
                 self.update = True

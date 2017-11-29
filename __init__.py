@@ -27,7 +27,11 @@ class Onaeri:
         self.devices = devices
 
         for cycleName in settings.cycles:
-            self.cycles.append( Cycle(cycleName, self.devices) )
+            lamps = []
+            for l in self.devices:
+                if cycleName.lower() in l.name.lower():
+                    lamps.append(l)
+            self.cycles.append( Cycle(cycleName, lamps) )
 
 
     def tick(self, lampDataList=None):
