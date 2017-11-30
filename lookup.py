@@ -35,8 +35,8 @@ class Lookup:
         self._userEveningSlope[2] = self._userEveningSlope[0]
         if self._userEveningSlope[0] < 0:
             self._userEveningSlope[0] = 0
-            self._userEveningSlope[2] += self.config.totalDataPoints
-            self._userEveningSlope[3] = self.config.totalDataPoints
+            self._userEveningSlope[2] += settings.Global.totalDataPoints
+            self._userEveningSlope[3] = settings.Global.totalDataPoints
 
         # Build lookup tables
         self.brightness = self._buildTable(brightnessData, self.config.briCorrect)
