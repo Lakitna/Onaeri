@@ -49,7 +49,9 @@ class Observer:
 
 
             if not self._legalChange:
-                if not self._unpoweredLamps == self._unpoweredLampsPrev and self.lookup.isNight:
+                if (self._lampCount > 1
+                    and self.lookup.isNight
+                    and not self._unpoweredLamps == self._unpoweredLampsPrev):
                     # If user tried to turn off the lamps while in dark mode
                     if len(self._unpoweredLamps) - len(self._unpoweredLampsPrev) in range(-1,1):
                         self.update = True
