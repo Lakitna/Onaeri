@@ -123,11 +123,10 @@ class Cycle:
         # If the lamp should be turned on according to Lookup
         if new.power:  return True
 
-        # If mode changes
-        if not new.mode == self.prevLamp[id].mode:  return True
-
         # If the lamp is currently on
         if self.observer[id].data.power:
+            # If mode changes
+            if not new.mode == self.prevLamp[id].mode:  return True
             # If the new values are not the same as the old ones
             if not new == self.prevLamp[id]:  return True
             # If observer calls for an update
