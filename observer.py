@@ -67,10 +67,14 @@ class Observer:
         """
         Compare new to previous lamp values. Returns lamp object and sets update flag.
         """
-        lamp = new
-
         if not prev == new:
-            logHighlight("[Observer] Illegal change detected:")
-            logHighlight("\t%s: %s" % (self._cycleName, new))
+            lamp = Lamp()
+            lamp.copy(new)
+            
+            if lamp.brightness == prev.brightness:  lamp.brightness = None
+            if lamp.color == prev.color:  lamp.color = None
+            if lamp.power == prev.power:  lamp.power = None
+
+            logHighlight("[[time]] Change detected in %s: %s" % (self._cycleName, lamp))
             self.update = True
         return new

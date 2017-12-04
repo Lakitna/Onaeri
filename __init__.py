@@ -24,6 +24,7 @@ class Onaeri:
         self.time = TimeKeeper()
         self.cycles = []
         self.update = False
+        self.logIt = {}
         self.devices = devices
 
         for cycleName in settings.cycles:
@@ -31,6 +32,8 @@ class Onaeri:
             for l in self.devices:
                 if cycleName.lower() in l.name.lower():
                     lamps[l.name] = l
+                    logHeaders(l.name)
+                    self.logIt[l.name] = 1
             self.cycles.append( Cycle(cycleName, lamps) )
 
 
@@ -51,5 +54,20 @@ class Onaeri:
 
             if cycle.tick( self.time, lampData ):
                 self.update = True
+                for id in cycle.lamp:
+                    self.logIt[id] = 3
+
+            # Log state of lamps
+            for id in cycle.lamp:
+                if self.logIt[id] == 1 or cycle.observer[id].update:
+                    logBlind("[time]\t%s\t%s\t%s\t%s\t%s" % (
+                            cycle.observer[id].data.brightness,
+                            cycle.observer[id].data.color,
+                            cycle.observer[id].data.power,
+                            cycle.observer[id].update,
+                            cycle.deviation[id].active
+                        ), id)
+                if self.logIt[id] > 0:
+                    self.logIt[id] -= 1
 
         self.time.tick()
