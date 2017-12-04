@@ -3,7 +3,7 @@ Onaeri API
 https://github.com/Lakitna/Onaeri
 """
 
-__version__ = '0.2.1'
+__version__ = '0.3.0'
 
 
 from .logger import *
@@ -27,7 +27,11 @@ class Onaeri:
         self.devices = devices
 
         for cycleName in settings.cycles:
-            self.cycles.append( Cycle(cycleName, self.devices) )
+            lamps = {}
+            for l in self.devices:
+                if cycleName.lower() in l.name.lower():
+                    lamps[l.name] = l
+            self.cycles.append( Cycle(cycleName, lamps) )
 
 
     def tick(self, lampDataList=None):
@@ -40,10 +44,10 @@ class Onaeri:
             if lampDataList == None:
                 lampData = None
             else:
-                lampData = []
+                lampData = {}
                 for lamp in lampDataList:
                     if cycle.name.lower() in lamp.name.lower():
-                        lampData.append(lamp)
+                        lampData[lamp.name] = lamp
 
             if cycle.tick( self.time, lampData ):
                 self.update = True

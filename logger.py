@@ -1,6 +1,8 @@
 from os import path, makedirs
 import time
-from . import settings
+
+setting_logFolder = "log"
+setting_logExtention = ".log"
 
 
 def log(string="", end="\n", flush=False):
@@ -75,12 +77,12 @@ def summary(values):
 
 
 # Check if logging folder exists and create if it doesn't
-folderPath = '%s/%s' % (path.dirname(path.abspath(__file__)), settings.Global.loggingFolder)
+folderPath = '%s/%s' % (path.dirname(path.abspath(__file__)), setting_logFolder)
 if not path.exists(folderPath):
     makedirs(folderPath)
 
 # Check if log file exists and create if it doesn't
-filePath = "%s/%s%s" % (folderPath, time.strftime("%d-%m-%Y"), settings.Global.loggingExtention)
+filePath = "%s/%s%s" % (folderPath, time.strftime("%d-%m-%Y"), setting_logExtention)
 if not path.isfile(filePath) or not path.getsize(filePath) > 0:
     with open(filePath, 'w') as f:
         f.write("Log opened on %s\n" % time.strftime("%d-%m-%Y @ %H:%M"))

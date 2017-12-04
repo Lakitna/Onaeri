@@ -7,11 +7,12 @@ class Lamp:
     """
     Data structure for a lamp
     """
-    def __init__(self, brightness=None, color=None, power=None, name=None):
+    def __init__(self, brightness=None, color=None, power=None, name=None, mode=None):
         self._brightness = brightness
         self._color = color
         self._power = power
         self._name = name
+        self._mode = mode
 
 
     def __call__(self):
@@ -59,12 +60,14 @@ class Lamp:
         for var in self.__dict__:
             var = None
 
-    def isEmpty(self):
+    def isEmpty(self, varList=None):
         """
         Check if values in object are all None
         """
+        if varList is None:  varList = self.__dict__
+
         empty = True
-        for var in self.__dict__:
+        for var in varList:
             if not getattr(self, var) == None:
                 empty = False
         return empty
@@ -80,6 +83,15 @@ class Lamp:
             self._power = value
         else:
             logWarn("[Lamp] Power input value error. Allowed values 'True', 'False' or 'None'.")
+
+
+    @property
+    def mode(self):
+        return self._mode
+
+    @mode.setter
+    def mode(self, value):
+        self._mode = value
 
 
     @property

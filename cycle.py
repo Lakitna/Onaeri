@@ -16,17 +16,25 @@ class Cycle:
     def __init__(self, name, devices):
         log("Setting up cycle named %s: " % name, end="", flush=True)
 
+        if len(devices) == 0:
+            logError("No lamps found with partial name `%s`." % name)
+            exit()
+        self.devices = devices
         self.name = name
-        self._devices = devices
-        self.settings = settings.get( self.name )
-        self.group = self._lampNameToIds( self.name )
         self.update = False
 
+        self.settings = settings.get( self.name )
         self.lookup = Lookup( self.settings )
-        self.observer = Observer( self.group, name )
-        self._deviation = Deviation( self.settings )
-        self.lamp = Lamp()
-        self.prevLamp = Lamp()
+
+        self.observer = {}
+        self._deviation = {}
+        self.lamp = {}
+        self.prevLamp = {}
+        for id in self.devices:
+            self.observer[id] = Observer( name )
+            self._deviation[id] = Deviation( self.settings )
+            self.lamp[id] = Lamp()
+            self.prevLamp[id] = Lamp()
 
         logSuccess("Done")
 
@@ -36,42 +44,52 @@ class Cycle:
         Progress cycle.
         """
         self.update = False
-        self.observer.look( lampData )
 
-        if timeKeeper.update or self.observer.update:
-            newVals = self.lookup.table( timeKeeper.timeCode )
+        for id in self.devices:
+            if not lampData is None:
+                self.observer[id].look( lampData[id] )
 
-            if self.observer.update:
-                self._deviation.change(newVals, self.observer.data)
+            if timeKeeper.update or self.observer[id].update:
+                newVals = self.lookup.table( timeKeeper.timeCode )
+                newVals.name = id
 
-            if self.observer.turnedOn:
-                self.lamp.copy(newVals)
-                self.lamp.power = None
-                self.update = True
-                self.observer.legalChange
-                self._deviation.reset()
-            else:
-                newVals = self._deviation.apply( newVals )
-                self.lamp = self._compareWithPrevious( newVals )
+                if self.observer[id].update:
+                    self._deviation[id].change(newVals, self.observer[id].data)
 
-            self.prevLamp.copy(newVals)
+
+                if self.observer[id].turnedOff:
+                    self.lamp[id].power = False
+                elif self.observer[id].turnedOn:
+                    if newVals.mode == 'dark' and 'dark' in id.lower():
+                        self.lamp[id].power = False
+                        self.lamp[id].brightness = None
+                    else:
+                        self.lamp[id].copy(newVals)
+                        self.lamp[id].power = None
+                    self.update = True
+                    self.observer[id].legalChange
+                    self._deviation[id].reset()
+                else:
+                    newVals = self._deviation[id].apply( newVals )
+                    self.lamp[id] = self._compareWithPrevious( newVals, id )
+
+                self.prevLamp[id].copy(newVals)
 
         return self.update
 
 
-    def _compareWithPrevious(self, vals):
+    def _compareWithPrevious(self, new, id):
         """
         Update lamp values (brightness & color)
         """
         lamp = Lamp()
-        # If the lamp is on and (value is not the same as previous update or observer dictates update) or lamp turns on
-        if self.observer.data.power and (not vals == self.prevLamp or self.observer.update) or vals.power:
-            if not vals.brightness == self.prevLamp.brightness:
-                lamp.brightness = vals.brightness
-            if not vals.color == self.prevLamp.color:
-                lamp.color = vals.color
-            if not vals.power == self.prevLamp.power:
-                lamp.power = vals.power
+        if self._lampUpdate(new, id):
+            if not new.brightness == self.prevLamp[id].brightness:
+                lamp.brightness = new.brightness
+            if not new.color == self.prevLamp[id].color:
+                lamp.color = new.color
+            if not new.power == self.prevLamp[id].power:
+                lamp.power = new.power
 
             if not lamp.power == None:
                 if not self.settings.automaticPowerOff and lamp.power == False:
@@ -79,26 +97,42 @@ class Cycle:
                 if not self.settings.automaticPowerOn and lamp.power == True:
                     lamp.power = None
 
+                if lamp.power == True:
+                    lamp.brightness = new.brightness
+                    lamp.color = new.color
+
+            lamp.mode = new.mode
+
+            if lamp.mode == 'dark' and len(self.devices) > 1:
+                if 'dark' in id.lower():
+                    lamp.brightness = None
+                    lamp.power = False
+
+            lamp.name = id
             self.update = True
-            self.observer.legalChange
+            self.observer[id].legalChange
 
         return lamp
 
 
-    def _lampNameToIds(self, name):
+    def _lampUpdate(self, new, id):
         """
-        Get lamp ids (plural) based on a partial device name.
+        Define if the lamps should be updated.
+        Previously a very complex if statement.
         """
-        ret = []
-        for i in range(len(self._devices)):
-            if name.lower() in self._devices[i].name.lower():
-                ret.append(i)
+        # If the lamp should be turned on according to Lookup
+        if new.power:  return True
 
-        if len(ret) == 0:
-            ret = [0] # Default to lamp 0
-            logError("[Cycle] No lamps found with partial name `%s`. Use the Ikea Tradfri app to change the name of a lamp." % name)
-        return ret
+        # If the lamp is currently on
+        if self.observer[id].data.power:
+            # If mode changes
+            if not new.mode == self.prevLamp[id].mode:  return True
+            # If the new values are not the same as the old ones
+            if not new == self.prevLamp[id]:  return True
+            # If observer calls for an update
+            if self.observer[id].update:  return True
 
+        return False
 
 
 
@@ -129,8 +163,15 @@ class Deviation:
         # log(changeVals)
 
         if changeVals.power and self.duration > 0:
-            self.setValues['brightness'] = changeVals.brightness - dataVals.brightness
-            self.setValues['color'] = changeVals.color - dataVals.color
+            if changeVals.color is None:
+                self.setValues['color'] = dataVals.color
+            else:
+                self.setValues['color'] = changeVals.color - dataVals.color
+
+            if changeVals.brightness is None:
+                self.setValues['brightness'] = dataVals.brightness
+            else:
+                self.setValues['brightness'] = changeVals.brightness - dataVals.brightness
 
             self.values = self.setValues.copy()
 
