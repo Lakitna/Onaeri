@@ -37,7 +37,7 @@ class Logger:
                 self.__call__("Log opened on [datetime]")
 
         self._writeToFile("\nProgram started\n")
-        self._writeToFile("%s\n", self._hr)
+        self._writeToFile("%s\n" % self._hr)
 
 
 
