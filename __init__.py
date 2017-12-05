@@ -32,7 +32,6 @@ class Onaeri:
             for l in self.devices:
                 if cycleName.lower() in l.name.lower():
                     lamps[l.name] = l
-                    logHeaders(l.name)
                     self.logIt[l.name] = 1
             self.cycles.append( Cycle(cycleName, lamps) )
 
@@ -60,7 +59,7 @@ class Onaeri:
             # Log state of lamps
             for id in cycle.lamp:
                 if self.logIt[id] == 1 or cycle.observer[id].update:
-                    logBlind("[time]\t%s\t%s\t%s\t%s\t%s" % (
+                    log.blind("[time]\t%s\t%s\t%s\t%s\t%s" % (
                             cycle.observer[id].data.brightness,
                             cycle.observer[id].data.color,
                             cycle.observer[id].data.power,

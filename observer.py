@@ -75,6 +75,6 @@ class Observer:
             if lamp.color == prev.color:  lamp.color = None
             if lamp.power == prev.power:  lamp.power = None
 
-            logHighlight("[[time]] Change detected in %s: %s" % (self._cycleName, lamp))
+            log.highlight("[[time]] Change detected in %s: %s" % (self._cycleName, lamp))
             self.update = True
         return new

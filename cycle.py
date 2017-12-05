@@ -17,7 +17,7 @@ class Cycle:
         log("Setting up cycle named %s: " % name, end="", flush=True)
 
         if len(devices) == 0:
-            logError("No lamps found with partial name `%s`." % name)
+            log.error("No lamps found with partial name `%s`." % name)
             exit()
         self.devices = devices
         self.name = name
@@ -36,7 +36,7 @@ class Cycle:
             self.lamp[id] = Lamp()
             self.prevLamp[id] = Lamp()
 
-        logSuccess("Done")
+        log.success("Done")
 
 
     def tick(self, timeKeeper, lampData):
