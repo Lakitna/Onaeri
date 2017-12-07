@@ -11,10 +11,8 @@ def scale(val, inRange, outRange, decimals=0):
 
     if ret % 1 == 0:
         ret = round(ret)
-    elif decimals > 0:
-        ret = round(ret * (10*decimals)) / (10*decimals)
     else:
-        ret = round(ret)
+        ret = round(ret, decimals)
 
     return ret
 
@@ -26,7 +24,7 @@ def sequenceResize(source, length):
     sourceLen = len(source)
     out = []
     for i in range(length):
-        key = round(i * (sourceLen/length))
+        key = int(i * (sourceLen/length))
         if key >= sourceLen:
             key = sourceLen-1
 

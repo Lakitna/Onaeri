@@ -6,6 +6,9 @@ settings/Sander.py
 settings/Jurrien.py
 settings/Hallway.py
 
+# log files
+log
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -13,7 +13,7 @@ class Lookup:
     Calculates and dispenses lookup tables for lamp values
     """
     def __init__(self, config):
-        self.timeKeeper = TimeKeeper();
+        self.timeKeeper = TimeKeeper()
         self.config = config
         self.lamp = Lamp()
         self.isNight = False
@@ -65,7 +65,7 @@ class Lookup:
 
         if timeCode in range((self._userSleepTime - self._userWindDownTime), settings.Global.totalDataPoints) or \
            timeCode in range(0, (self._userAlarmTime - self._userAlarmOffset)):
-           self.lamp.mode = 'dark'
+            self.lamp.mode = 'dark'
         else:
             self.lamp.mode = None
 

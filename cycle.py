@@ -173,10 +173,9 @@ class Deviation:
             else:
                 self.setValues['brightness'] = changeVals.brightness - dataVals.brightness
 
-            self.values = self.setValues.copy()
-
-            if not inRange(self.setValues['brightness'], (-1,1)) \
+            if not inRange(self.setValues['brightness'], (-10,10)) \
                or not inRange(self.setValues['color'], (-10,10)):
+                self.values = self.setValues.copy()
                 self.active = True
 
 
