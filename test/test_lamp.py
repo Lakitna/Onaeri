@@ -9,7 +9,7 @@ def test_set_get():
     l.color = 20
     assert l.color == 20
     l.power = True
-    assert l.power == True
+    assert l.power is True
     l.mode = 'hello'
     assert l.mode == 'hello'
     l.name = 'world'
