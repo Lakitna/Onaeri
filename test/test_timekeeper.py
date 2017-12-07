@@ -1,5 +1,4 @@
 from ..timekeeper import TimeKeeper
-import pytest
 
 
 def test_tick():
@@ -9,11 +8,11 @@ def test_tick():
     assert t.runtime == 0
 
     t.tick()
-    assert t.update == True
+    assert t.update is True
     assert t.runtime == 1
 
     t.tick()
-    assert t.update == False
+    assert t.update is False
     assert t.runtime == 1
 
 
@@ -34,7 +33,7 @@ def test_makecode():
     assert t.makeCode(h=2) == 60
     assert t.makeCode(m=1) == 0
 
-    for i in range(1,30):
+    for i in range(1, 30):
         t._minPerTimeCode = i/10
         max = t.makeCode(h=12, m=30)
         assert round(max * t._minPerTimeCode) in range(748, 752)

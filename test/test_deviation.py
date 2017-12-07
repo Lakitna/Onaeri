@@ -17,7 +17,7 @@ def test_change():
     change = Lamp(100, 50, True)
     d = cycle.Deviation(testSettings)
     d.change(data, change)
-    assert d.active == True
+    assert d.active is True
     assert d.setValues == {'brightness': 50, 'color': 0}
     assert d.values == {'brightness': 50, 'color': 0}
 
@@ -25,7 +25,7 @@ def test_change():
     change = Lamp(55, 49, True)
     d = cycle.Deviation(testSettings)
     d.change(data, change)
-    assert d.active == False
+    assert d.active is False
     assert d.setValues == {'brightness': 5, 'color': -1}
     assert d.values == {'brightness': 0, 'color': 0}
 
@@ -41,7 +41,7 @@ def test_apply():
         new = Lamp(50, 50, True)
         result = d.apply(new)
         if i == testSettings.deviationDuration:
-            assert d.active == False
+            assert d.active is False
             assert d.values == {'brightness': 0, 'color': 0}
             assert d.setValues == {'brightness': 0, 'color': 0}
             assert result.brightness in range(50, 55)

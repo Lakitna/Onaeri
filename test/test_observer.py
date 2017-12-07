@@ -15,27 +15,27 @@ def test_look(capsys):
     inp = Lamp(100, 50, True)
     o.look(inp)
     assert o.data == inp
-    assert o.update == False
+    assert o.update is False
 
     inp = Lamp(70, 50, True)
     o.look(inp)
     assert o.data == inp
-    assert o.update == True
+    assert o.update is True
 
     inp = Lamp(70, 50, True)
     o.look(inp)
-    assert o.update == False
-    assert o.turnedOn == False
-    assert o.turnedOff == False
+    assert o.update is False
+    assert o.turnedOn is False
+    assert o.turnedOff is False
 
     inp = Lamp(70, 50, False)
     o.look(inp)
-    assert o.update == True
-    assert o.turnedOn == False
-    assert o.turnedOff == True
+    assert o.update is True
+    assert o.turnedOn is False
+    assert o.turnedOff is True
 
     inp = Lamp(70, 50, True)
     o.look(inp)
-    assert o.update == True
-    assert o.turnedOn == True
-    assert o.turnedOff == False
+    assert o.update is True
+    assert o.turnedOn is True
+    assert o.turnedOff is False

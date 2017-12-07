@@ -28,9 +28,9 @@ def test_tick(capsys):
 
     o.tick(devices)
     o.tick(devices)
-    assert not o.update
+    assert o.update is False
     o.tick(None)
-    assert not o.update
+    assert o.update is False
 
     devices = [
             Lamp(10, 85, True, name="Template One"),
@@ -39,4 +39,4 @@ def test_tick(capsys):
             Lamp(9, 4, True, name="Template Four"),
         ]
     o.tick(devices)
-    assert o.update
+    assert o.update is True
