@@ -3,7 +3,7 @@ Onaeri API
 https://github.com/Lakitna/Onaeri
 """
 
-__version__ = '0.3.0'
+__version__ = '0.4.0'
 
 
 from .logger import *
@@ -51,5 +51,15 @@ class Onaeri:
 
             if cycle.tick( self.time, lampData ):
                 self.update = True
+
+            if self.time.update:
+                for id in cycle.lamp:
+                    log.blind("[time]\t%s\t%s\t%s\t%s\t%s" % (
+                            cycle.observer[id].data.brightness,
+                            cycle.observer[id].data.color,
+                            cycle.observer[id].data.power,
+                            cycle.observer[id].update,
+                            cycle.deviation[id].active
+                        ), id)
 
         self.time.tick()

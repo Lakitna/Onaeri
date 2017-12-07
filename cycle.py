@@ -17,7 +17,7 @@ class Cycle:
         log("Setting up cycle named %s: " % name, end="", flush=True)
 
         if len(devices) == 0:
-            logError("No lamps found with partial name `%s`." % name)
+            log.error("No lamps found with partial name `%s`." % name)
             exit()
         self.devices = devices
         self.name = name
@@ -27,16 +27,16 @@ class Cycle:
         self.lookup = Lookup( self.settings )
 
         self.observer = {}
-        self._deviation = {}
+        self.deviation = {}
         self.lamp = {}
         self.prevLamp = {}
         for id in self.devices:
             self.observer[id] = Observer( name )
-            self._deviation[id] = Deviation( self.settings )
+            self.deviation[id] = Deviation( self.settings )
             self.lamp[id] = Lamp()
             self.prevLamp[id] = Lamp()
 
-        logSuccess("Done")
+        log.success("Done")
 
 
     def tick(self, timeKeeper, lampData):
@@ -54,7 +54,7 @@ class Cycle:
                 newVals.name = id
 
                 if self.observer[id].update:
-                    self._deviation[id].change(newVals, self.observer[id].data)
+                    self.deviation[id].change(newVals, self.observer[id].data)
 
 
                 if self.observer[id].turnedOff:
@@ -68,9 +68,9 @@ class Cycle:
                         self.lamp[id].power = None
                     self.update = True
                     self.observer[id].legalChange
-                    self._deviation[id].reset()
+                    self.deviation[id].reset()
                 else:
-                    newVals = self._deviation[id].apply( newVals )
+                    newVals = self.deviation[id].apply( newVals )
                     self.lamp[id] = self._compareWithPrevious( newVals, id )
 
                 self.prevLamp[id].copy(newVals)

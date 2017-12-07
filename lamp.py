@@ -82,7 +82,7 @@ class Lamp:
         if value == None or value == True or value == False:
             self._power = value
         else:
-            logWarn("[Lamp] Power input value error. Allowed values 'True', 'False' or 'None'.")
+            log.warn("[Lamp] Power input value error. Allowed values 'True', 'False' or 'None'.")
 
 
     @property
@@ -105,7 +105,7 @@ class Lamp:
         elif inRange(value, valRange):
             self._brightness = value
         else:
-            logWarn("[Lamp] Brightness input value error. %d given, allowed range %s" % (value, str(valRange)))
+            log.warn("[Lamp] Brightness input value error. %d given, allowed range %s" % (value, str(valRange)))
 
 
     @property
@@ -119,7 +119,7 @@ class Lamp:
         elif inRange(value, valRange):
             self._color = value
         else:
-            logWarn("[Lamp] Color input value error. %d given, allowed range %s" % (value, str(valRange)))
+            log.warn("[Lamp] Color input value error. %d given, allowed range %s" % (value, str(valRange)))
 
 
     @property
