@@ -159,12 +159,18 @@ class Logger:
         with open("%s/%s%s" % (self.folderPath, name, extention), 'a') as f:
             f.write(string)
 
-
     def _stringReplace(self, string):
         string = string.replace("[datetime]", "[date] [time]")
-        string = string.replace("[time]", time.strftime(self.settings['timestamp']))
-        string = string.replace("[date]", time.strftime(self.settings['datestamp']))
+        string = string.replace(
+                "[time]",
+                time.strftime(self.settings['timestamp'])
+            )
+        string = string.replace(
+                "[date]",
+                time.strftime(self.settings['datestamp'])
+            )
 
         return string
+
 
 log = Logger()

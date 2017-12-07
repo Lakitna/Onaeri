@@ -70,11 +70,15 @@ class Observer:
         if not prev == new:
             lamp = Lamp()
             lamp.copy(new)
-            
-            if lamp.brightness == prev.brightness:  lamp.brightness = None
-            if lamp.color == prev.color:  lamp.color = None
-            if lamp.power == prev.power:  lamp.power = None
 
-            log.highlight("[[time]] Change detected in %s: %s" % (self._cycleName, lamp))
+            if lamp.brightness == prev.brightness:
+                lamp.brightness = None
+            if lamp.color == prev.color:
+                lamp.color = None
+            if lamp.power == prev.power:
+                lamp.power = None
+
+            log.highlight("[[time]] Change detected in %s: %s"
+                % (self._cycleName, lamp))
             self.update = True
         return new

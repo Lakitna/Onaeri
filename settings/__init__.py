@@ -2,7 +2,7 @@ import os
 import importlib
 from . import Global
 from .. import data
-from ..logger import *
+from ..logger import log
 
 
 blacklist = ["Global", "Template", "__init__"]
@@ -14,7 +14,8 @@ def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
     """
     def _ruling(v, rnge):
         if not rnge[0] <= v <= rnge[1]:
-            log.error("Invalid setting. '%s' is not in allowed range (%s - %s)." % (val, rnge[0], rnge[1]))
+            log.error("Invalid setting. '%s' is not in allowed range (%s - %s)."
+                % (val, rnge[0], rnge[1]))
             exit()
 
     if check is None:
@@ -25,7 +26,8 @@ def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
             _ruling(val, (rmin, rmax))
     elif check is "unsigned":
         if not val >= 0:
-            log.error("Invalid setting. '%s' is not in allowed range (%s - ∞)." % (val, rmin))
+            log.error("Invalid setting. '%s' is not in allowed range (%s - ∞)."
+                % (val, rmin))
             exit()
     elif check is "string":
         if not type(val) is str:
@@ -68,7 +70,8 @@ def _settingFileList():
     Get list of setting files from settings folder.
     """
     ret = []
-    files = [f for f in os.listdir(os.path.dirname(__file__)) if os.path.isfile(os.path.join(os.path.dirname(__file__), f))]
+    files = [f for f in os.listdir(os.path.dirname(__file__))
+                if os.path.isfile(os.path.join(os.path.dirname(__file__), f))]
     for f in files:
         if f.endswith(Global.settingFileExtention):
             f = f.split(".")[0] # Remove extention
@@ -79,7 +82,8 @@ def _settingFileList():
 
 cycles = _settingFileList();
 if len(cycles) == 0:
-    log.error("No setting files found. Please create a file in the `settings` folder using the Template.py.")
+    log.error("No setting files found. \
+        Please create a file in the `settings` folder using the Template.py.")
 
 
 def get(settingFile=""):
@@ -93,9 +97,15 @@ def get(settingFile=""):
     userSettings = importlib.import_module(__name__+"."+settingFile, package=None)
 
     # Some calculations on settings
-    userSettings.eveningSlopeDuration = round(userSettings.eveningSlopeDuration // Global.minPerTimeCode)
-    userSettings.morningSlopeDuration = round(userSettings.morningSlopeDuration // Global.minPerTimeCode)
-    userSettings.deviationDuration = round(userSettings.deviationDuration // Global.minPerTimeCode)
+    userSettings.eveningSlopeDuration = round(
+            userSettings.eveningSlopeDuration // Global.minPerTimeCode
+        )
+    userSettings.morningSlopeDuration = round(
+            userSettings.morningSlopeDuration // Global.minPerTimeCode
+        )
+    userSettings.deviationDuration = round(
+            userSettings.deviationDuration // Global.minPerTimeCode
+        )
 
     userSettingsValidation(userSettings)
 
