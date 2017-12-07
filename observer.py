@@ -79,6 +79,6 @@ class Observer:
                 lamp.power = None
 
             log.highlight("[[time]] Change detected in %s: %s"
-                % (self._cycleName, lamp))
+                          % (self._cycleName, lamp))
             self.update = True
         return new

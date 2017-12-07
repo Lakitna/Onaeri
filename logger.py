@@ -15,18 +15,21 @@ class Logger:
         self._hr = "—" * 50
 
         # Check if main logging folder exists and create if it doesn't
-        self.folderPath = '%s/%s' % (os.path.dirname(os.path.abspath(__file__)), self.settings['folder'])
+        path = os.path.dirname(os.path.abspath(__file__))
+        self.folderPath = '%s/%s' % (path, self.settings['folder'])
         if not os.path.exists(self.folderPath):
             os.makedirs(self.folderPath)
 
         # Remove old log files
         for f in os.listdir(self.folderPath):
             path = os.path.join(self.folderPath, f)
-            if os.path.getmtime(path) < (time.time() - (self.settings['keepLogsFor'] * 86400)):
+            offset = time.time() - (self.settings['keepLogsFor'] * 86400)
+            if os.path.getmtime(path) < offset:
                 os.remove(path)
 
         # Check if daily logging folder exists and create if it doesn't
-        self.folderPath = '%s/%s' % (self.folderPath, time.strftime(self.settings['datestamp']))
+        self.folderPath = '%s/%s'
+            % (self.folderPath, time.strftime(self.settings['datestamp']))
         if not os.path.exists(self.folderPath):
             os.makedirs(self.folderPath)
 
@@ -39,8 +42,6 @@ class Logger:
         self._writeToFile("\nProgram started\n")
         self._writeToFile("%s\n" % self._hr)
 
-
-
     def __call__(self, string="", name=None, end="\n", flush=False):
         """
         Log and print a message
@@ -50,7 +51,6 @@ class Logger:
 
         string = "%s%s" % (string, end)
         self._writeToFile(string, name)
-
 
     def error(self, string="", name=None, end="\n", flush=False):
         """
@@ -62,7 +62,6 @@ class Logger:
         string = "[ERROR] %s [/ERROR]%s" % (string, end)
         self._writeToFile(string, name)
 
-
     def blind(self, string="", name=None, end="\n"):
         """
         Log in the background
@@ -70,7 +69,6 @@ class Logger:
         string = self._stringReplace(string)
         string = "%s%s" % (string, end)
         self._writeToFile(string, name)
-
 
     def warn(self, string="", name=None, end="\n", flush=False):
         """
@@ -82,7 +80,6 @@ class Logger:
         string = "!!! %s !!!%s" % (string, end)
         self._writeToFile(string, name)
 
-
     def success(self, string="", name=None, end="\n", flush=False):
         """
         Log and print a success message
@@ -93,7 +90,6 @@ class Logger:
         string = "[%s]%s" % (string, end)
         self._writeToFile(string, name)
 
-
     def highlight(self, string="", name=None, end="\n", flush=False):
         """
         Log and print a highlighted message
@@ -103,7 +99,6 @@ class Logger:
 
         string = "%s%s" % (string, end)
         self._writeToFile(string, name)
-
 
     def summary(self, values):
         """
@@ -118,20 +113,18 @@ class Logger:
             if type(values[key]) is dict:
                 self.__call__("%s:" % key)
                 for subkey in values[key]:
-                    self.__call__("\t%s:\t\t%s" % (subkey, values[key][subkey]))
+                    self.__call__("\t%s:\t\t%s"
+                        % (subkey, values[key][subkey]))
             else:
                 self.__call__("%s:\t\t%s" % (key, values[key]))
         self.__call__()
         self._writeToFile("\n\n\n\n\n")
-
 
     def row(self):
         """
         Log a separator row of default length.
         """
         self.__call__(self._hr)
-
-
 
     def _fileHeaders(self, name):
         return "%s\t%s\t%s\t%s\t%s\t%s\n" % (
@@ -143,7 +136,6 @@ class Logger:
             "Deviation active"
         )
 
-
     def _writeToFile(self, string, name=None):
         """
         Add a log entry to logfile
@@ -153,7 +145,8 @@ class Logger:
             name = self.settings['programLog']
             extention = ""
         else:
-            if not os.path.exists("%s/%s%s" % (self.folderPath, name, extention)):
+            if not os.path.exists("%s/%s%s"
+                % (self.folderPath, name, extention)):
                 string = self._fileHeaders(name) + string
 
         with open("%s/%s%s" % (self.folderPath, name, extention), 'a') as f:

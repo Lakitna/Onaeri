@@ -14,8 +14,10 @@ def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
     """
     def _ruling(v, rnge):
         if not rnge[0] <= v <= rnge[1]:
-            log.error("Invalid setting. '%s' is not in allowed range (%s - %s)."
-                % (val, rnge[0], rnge[1]))
+            log.error(
+                    "Invalid setting. '%s' is not in allowed range (%s - %s)."
+                    % (val, rnge[0], rnge[1])
+                )
             exit()
 
     if check is None:
@@ -27,7 +29,7 @@ def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
     elif check is "unsigned":
         if not val >= 0:
             log.error("Invalid setting. '%s' is not in allowed range (%s - ∞)."
-                % (val, rmin))
+                      % (val, rmin))
             exit()
     elif check is "string":
         if not type(val) is str:
@@ -71,7 +73,7 @@ def _settingFileList():
     """
     ret = []
     files = [f for f in os.listdir(os.path.dirname(__file__))
-                if os.path.isfile(os.path.join(os.path.dirname(__file__), f))]
+             if os.path.isfile(os.path.join(os.path.dirname(__file__), f))]
     for f in files:
         if f.endswith(Global.settingFileExtention):
             f = f.split(".")[0] # Remove extention
@@ -94,7 +96,8 @@ def get(settingFile=""):
         log.error("Setting file %s not found" % settingFile)
         exit()
 
-    userSettings = importlib.import_module(__name__+"."+settingFile, package=None)
+    userSettings = importlib.import_module(
+        __name__+"."+settingFile, package=None)
 
     # Some calculations on settings
     userSettings.eveningSlopeDuration = round(
