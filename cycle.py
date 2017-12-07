@@ -198,11 +198,11 @@ class Deviation:
             newVals.brightness = limitTo(
                             newVals.brightness + self.values['brightness'],
                             settings.Global.valRange
-                        );
+                        )
             newVals.color = limitTo(
                             newVals.color + self.values['color'],
                             settings.Global.valRange
-                        );
+                        )
             self.counter += 1
 
         return newVals
