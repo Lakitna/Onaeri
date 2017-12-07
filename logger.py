@@ -12,7 +12,7 @@ class Logger:
                 "programLog": "main.log",
                 "timestamp": "%H:%M:%S",
                 "datestamp": "%d-%m-%Y",
-                "keepLogsFor": 30 #days
+                "keepLogsFor": 30  # in days
             }
         self._hr = "—" * 50
 
@@ -117,8 +117,8 @@ class Logger:
             if type(values[key]) is dict:
                 self.__call__("%s:" % key)
                 for subkey in values[key]:
-                    self.__call__("\t%s:\t\t%s"
-                        % (subkey, values[key][subkey]))
+                    self.__call__("\t%s:\t\t%s" % (
+                                    subkey, values[key][subkey]))
             else:
                 self.__call__("%s:\t\t%s" % (key, values[key]))
         self.__call__()

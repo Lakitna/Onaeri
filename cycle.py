@@ -38,7 +38,6 @@ class Cycle:
 
         log.success("Done")
 
-
     def tick(self, timeKeeper, lampData):
         """
         Progress cycle.
@@ -46,7 +45,7 @@ class Cycle:
         self.update = False
 
         for id in self.devices:
-            if not lampData is None:
+            if lampData is not None:
                 self.observer[id].look(lampData[id])
 
             if timeKeeper.update or self.observer[id].update:
@@ -55,7 +54,6 @@ class Cycle:
 
                 if self.observer[id].update:
                     self.deviation[id].change(newVals, self.observer[id].data)
-
 
                 if self.observer[id].turnedOff:
                     self.lamp[id].power = False
@@ -77,7 +75,6 @@ class Cycle:
 
         return self.update
 
-
     def _compareWithPrevious(self, new, id):
         """
         Update lamp values (brightness & color)
@@ -91,13 +88,13 @@ class Cycle:
             if not new.power == self.prevLamp[id].power:
                 lamp.power = new.power
 
-            if not lamp.power == None:
-                if not self.settings.automaticPowerOff and lamp.power == False:
+            if lamp.power is not None:
+                if not self.settings.automaticPowerOff and lamp.power is False:
                     lamp.power = None
-                if not self.settings.automaticPowerOn and lamp.power == True:
+                if not self.settings.automaticPowerOn and lamp.power is True:
                     lamp.power = None
 
-                if lamp.power == True:
+                if lamp.power is True:
                     lamp.brightness = new.brightness
                     lamp.color = new.color
 
@@ -114,29 +111,28 @@ class Cycle:
 
         return lamp
 
-
     def _lampUpdate(self, new, id):
         """
         Define if the lamps should be updated.
         Previously a very complex if statement.
         """
         # If the lamp should be turned on according to Lookup
-        if new.power:  return True
+        if new.power:
+            return True
 
         # If the lamp is currently on
         if self.observer[id].data.power:
             # If mode changes
-            if not new.mode == self.prevLamp[id].mode:  return True
+            if not new.mode == self.prevLamp[id].mode:
+                return True
             # If the new values are not the same as the old ones
-            if not new == self.prevLamp[id]:  return True
+            if not new == self.prevLamp[id]:
+                return True
             # If observer calls for an update
-            if self.observer[id].update:  return True
+            if self.observer[id].update:
+                return True
 
         return False
-
-
-
-
 
 
 class Deviation:
@@ -152,7 +148,6 @@ class Deviation:
         self.values = {'brightness': 0, 'color': 0}
         self.setValues = {'brightness': 0, 'color': 0}
         self.reset()
-
 
     def change(self, dataVals, changeVals):
         """
@@ -178,7 +173,6 @@ class Deviation:
                or not inRange(self.setValues['color'], (-10, 10)):
                 self.values = self.setValues.copy()
                 self.active = True
-
 
     def apply(self, newVals):
         """
@@ -206,7 +200,6 @@ class Deviation:
             self.counter += 1
 
         return newVals
-
 
     def reset(self):
         """

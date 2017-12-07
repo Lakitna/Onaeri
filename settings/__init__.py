@@ -47,7 +47,6 @@ def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
         exit()
 
 
-
 _checkIntegrity(Global.minPerTimeCode, check="unsigned")
 _checkIntegrity(Global.transitionTime, check="unsigned")
 _checkIntegrity(Global.totalDataPoints, check="unsigned")
@@ -66,7 +65,6 @@ _checkIntegrity(data.colorData['evening'], 0, 100)
 _checkIntegrity(data.deviationData, 0, 100)
 
 
-
 def _settingFileList():
     """
     Get list of setting files from settings folder.
@@ -76,13 +74,13 @@ def _settingFileList():
              if os.path.isfile(os.path.join(os.path.dirname(__file__), f))]
     for f in files:
         if f.endswith(Global.settingFileExtention):
-            f = f.split(".")[0] # Remove extention
+            f = f.split(".")[0]  # Remove extention
             if f not in blacklist:
-                ret.append( f )
+                ret.append(f)
     return ret
 
 
-cycles = _settingFileList();
+cycles = _settingFileList()
 if len(cycles) == 0:
     log.error("No setting files found. \
         Please create a file in the `settings` folder using the Template.py.")
@@ -92,7 +90,7 @@ def get(settingFile=""):
     """
     Return a setting file
     """
-    if not settingFile in cycles:
+    if settingFile not in cycles:
         log.error("Setting file %s not found" % settingFile)
         exit()
 

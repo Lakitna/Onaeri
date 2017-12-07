@@ -13,7 +13,6 @@ class TimeKeeper:
         self.update = True
         self.runtime = 0
 
-
     def tick(self):
         """
         Progress the timekeeper and set update flag on timeCode change.
@@ -24,29 +23,33 @@ class TimeKeeper:
             self.update = True
             self.runtime += 1
 
-
     def makeCode(self, h=None, m=None, s=None, dry=False):
         """
         Calculate a new timecode
         """
-        if h == None and m == None and s == None:
+        if h is None and m is None and s is None:
             h = time.localtime().tm_hour
             m = time.localtime().tm_min
             s = time.localtime().tm_sec
 
-        if h == None:  h=0
-        if m == None:  m=0
-        if s == None:  s=0
+        if h is None:
+            h = 0
+        if m is None:
+            m = 0
+        if s is None:
+            s = 0
 
         if type(h) is tuple:
-            if len(h) > 2:  s = h[2]
-            if len(h) > 1:  m = h[1]
+            if len(h) > 2:
+                s = h[2]
+            if len(h) > 1:
+                m = h[1]
             h = h[0]
 
         ret = math.floor(((h*60) + m + (s/60)) / self._minPerTimeCode)
-        if not dry:  self.timeCode = ret
+        if not dry:
+            self.timeCode = ret
         return ret
-
 
     @property
     def timeStamp(self):
@@ -58,4 +61,4 @@ class TimeKeeper:
         m = math.floor(minutes % 60)
         s = math.floor((minutes % 1) * 60)
 
-        return "%02d:%02d:%02d" % (h,m,s)
+        return "%02d:%02d:%02d" % (h, m, s)

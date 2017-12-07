@@ -15,7 +15,6 @@ from .timekeeper import TimeKeeper
 from . import settings
 
 
-
 class Onaeri:
     """
     Onaeri API wrapper
@@ -31,8 +30,9 @@ class Onaeri:
             for l in self.devices:
                 if cycleName.lower() in l.name.lower():
                     lamps[l.name] = l
-            self.cycles.append( Cycle(cycleName, lamps) )
-
+            self.cycles.append(
+                    Cycle(cycleName, lamps)
+                )
 
     def tick(self, lampDataList=None):
         """
@@ -41,7 +41,7 @@ class Onaeri:
         self.update = False
 
         for cycle in self.cycles:
-            if lampDataList == None:
+            if lampDataList is None:
                 lampData = None
             else:
                 lampData = {}
@@ -49,7 +49,7 @@ class Onaeri:
                     if cycle.name.lower() in lamp.name.lower():
                         lampData[lamp.name] = lamp
 
-            if cycle.tick( self.time, lampData ):
+            if cycle.tick(self.time, lampData):
                 self.update = True
 
             if self.time.update:

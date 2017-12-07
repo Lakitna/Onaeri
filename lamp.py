@@ -7,13 +7,14 @@ class Lamp:
     """
     Data structure for a lamp
     """
-    def __init__(self, brightness=None, color=None, power=None, name=None, mode=None):
+    def __init__(self, brightness=None,
+                 color=None, power=None,
+                 name=None, mode=None):
         self._brightness = brightness
         self._color = color
         self._power = power
         self._name = name
         self._mode = mode
-
 
     def __call__(self):
         """
@@ -31,7 +32,7 @@ class Lamp:
         ret = {}
         for var in self.__dict__:
             val = getattr(self, var)
-            if not val is None:
+            if val is not None:
                 ret[var.lstrip("_")] = val
         return str(ret)
 
@@ -40,11 +41,13 @@ class Lamp:
         Compare with other object of same type
         """
         ret = True
-        if not self._brightness == other._brightness:  ret = False
-        if not self._color == other._color:  ret = False
-        if not self._power == other._power:  ret = False
+        if not self._brightness == other._brightness:
+            ret = False
+        if not self._color == other._color:
+            ret = False
+        if not self._power == other._power:
+            ret = False
         return ret
-
 
     def copy(self, obj):
         """
@@ -64,14 +67,14 @@ class Lamp:
         """
         Check if values in object are all None
         """
-        if varList is None:  varList = self.__dict__
+        if varList is None:
+            varList = self.__dict__
 
         empty = True
         for var in varList:
-            if not getattr(self, var) == None:
+            if getattr(self, var) is not None:
                 empty = False
         return empty
-
 
     @property
     def power(self):
@@ -79,12 +82,11 @@ class Lamp:
 
     @power.setter
     def power(self, value):
-        if value == None or value == True or value == False:
+        if value is None or value is True or value is False:
             self._power = value
         else:
             log.warn("[Lamp] Power input value error." +
                      "Allowed values 'True', 'False' or 'None'.")
-
 
     @property
     def mode(self):
@@ -93,7 +95,6 @@ class Lamp:
     @mode.setter
     def mode(self, value):
         self._mode = value
-
 
     @property
     def brightness(self):
@@ -109,7 +110,6 @@ class Lamp:
             log.warn("[Lamp] Brightness input value error." +
                      "%d given, allowed range %s" % (value, str(valRange)))
 
-
     @property
     def color(self):
         return self._color
@@ -123,7 +123,6 @@ class Lamp:
         else:
             log.warn("[Lamp] Color input value error." +
                      "%d given, allowed range %s" % (value, str(valRange)))
-
 
     @property
     def name(self):
