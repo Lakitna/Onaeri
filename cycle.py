@@ -2,7 +2,7 @@ import time
 from .timekeeper import TimeKeeper
 from .lookup import Lookup
 from .helper import sequenceResize, inRange, limitTo
-from .data import deviationData
+from . import data
 from .observer import Observer
 from .lamp import Lamp
 from . import settings
@@ -141,7 +141,7 @@ class Deviation:
     """
     def __init__(self, userSettings):
         self.duration = userSettings.deviationDuration
-        self.table = sequenceResize(deviationData, self.duration)
+        self.table = sequenceResize(data.deviation, self.duration)
 
         self.counter = 0
         self.active = False

@@ -1,5 +1,5 @@
 from .timekeeper import TimeKeeper
-from .data import brightnessData, colorData
+from . import data
 from .helper import scale, sequenceResize, inRange
 from .lamp import Lamp
 from .logger import *
@@ -48,9 +48,9 @@ class Lookup:
 
         # Build lookup tables
         self.brightness = self._buildTable(
-                                brightnessData, self.config.briCorrect)
+                                data.brightness, self.config.briCorrect)
         self.color = self._buildTable(
-                                colorData, self.config.colorCorrect)
+                                data.color, self.config.colorCorrect)
 
         # print(self.brightness)
         # print()
