@@ -18,16 +18,16 @@ def test_set_get():
 
 def test_init():
     l = lamp.Lamp()
-    assert l.brightness == None
-    assert l.color == None
-    assert l.power == None
-    assert l.name == None
-    assert l.mode == None
+    assert l.brightness is None
+    assert l.color is None
+    assert l.power is None
+    assert l.name is None
+    assert l.mode is None
 
     l = lamp.Lamp(100, 90, True, "testName", "testMode")
     assert l.brightness == 100
     assert l.color == 90
-    assert l.power == True
+    assert l.power is True
     assert l.name == "testName"
     assert l.mode == "testMode"
 
@@ -64,9 +64,9 @@ def test_copy():
 
 def test_empty():
     l = lamp.Lamp(100, 50, False)
-    assert l.isEmpty() == False
+    assert l.isEmpty() is False
     l.empty()
-    assert l.isEmpty() == True
+    assert l.isEmpty() is True
     l = lamp.Lamp(100, None, None)
-    assert l.isEmpty(['color', 'power']) == True
-    assert l.isEmpty(['brightness', 'color']) == False
+    assert l.isEmpty(['color', 'power']) is True
+    assert l.isEmpty(['brightness', 'color']) is False

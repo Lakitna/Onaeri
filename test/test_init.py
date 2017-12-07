@@ -1,11 +1,6 @@
 from .. import Onaeri
 from ..lamp import Lamp
-
-from ..cycle import Cycle
-from ..timekeeper import TimeKeeper
 from .. import settings
-
-import pytest
 
 
 def test_init():
@@ -33,10 +28,9 @@ def test_tick(capsys):
 
     o.tick(devices)
     o.tick(devices)
-    assert o.update == False
+    assert not o.update
     o.tick(None)
-    assert o.update == False
-
+    assert not o.update
 
     devices = [
             Lamp(10, 85, True, name="Template One"),
@@ -45,4 +39,4 @@ def test_tick(capsys):
             Lamp(9, 4, True, name="Template Four"),
         ]
     o.tick(devices)
-    assert o.update == True
+    assert o.update
