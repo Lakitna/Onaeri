@@ -58,7 +58,7 @@ class Lamp:
         Set all values to None
         """
         for var in self.__dict__:
-            var = None
+            setattr(self, var, None)
 
     def isEmpty(self, varList=None):
         """

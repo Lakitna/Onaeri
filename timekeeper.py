@@ -43,21 +43,19 @@ class TimeKeeper:
             if len(h) > 1:  m = h[1]
             h = h[0]
 
-        ret = math.floor( ( (h*60) + m + (s/60) ) // self._minPerTimeCode )
+        ret = math.floor(((h*60) + m + (s/60)) / self._minPerTimeCode)
         if not dry:  self.timeCode = ret
         return ret
 
 
     @property
-    def timeStamp(self, code=None):
+    def timeStamp(self):
         """
         Return the timestring of a timecode
         """
-        if code is None:  code = self.timeCode
-
-        minutes = code * self._minPerTimeCode
+        minutes = self.timeCode * self._minPerTimeCode
         h = math.floor(minutes / 60)
         m = math.floor(minutes % 60)
-        s = math.floor( (minutes % 1) * 60 )
+        s = math.floor((minutes % 1) * 60)
 
         return "%02d:%02d:%02d" % (h,m,s)
