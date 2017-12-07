@@ -14,7 +14,7 @@ def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
     """
     def _ruling(v, rnge):
         if not rnge[0] <= v <= rnge[1]:
-            logError("Invalid setting. '%s' is not in allowed range (%s - %s)." % (val, rnge[0], rnge[1]))
+            log.error("Invalid setting. '%s' is not in allowed range (%s - %s)." % (val, rnge[0], rnge[1]))
             exit()
 
     if check is None:
@@ -25,21 +25,21 @@ def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
             _ruling(val, (rmin, rmax))
     elif check is "unsigned":
         if not val >= 0:
-            logError("Invalid setting. '%s' is not in allowed range (%s - ∞)." % (val, rmin))
+            log.error("Invalid setting. '%s' is not in allowed range (%s - ∞)." % (val, rmin))
             exit()
     elif check is "string":
         if not type(val) is str:
-            logError("Invalid setting. '%s' is not a string." % (val))
+            log.error("Invalid setting. '%s' is not a string." % (val))
             exit()
     elif check is "boolean":
         if not type(val) is bool:
-            logError("Invalid setting. '%s' is not boolean." % (val))
+            log.error("Invalid setting. '%s' is not boolean." % (val))
             exit()
     elif check is "time":
         _ruling(val[0], (0, 23))
         _ruling(val[1], (0, 59))
     else:
-        logError("Check `%s` could not be performed." % check)
+        log.error("Check `%s` could not be performed." % check)
         exit()
 
 
@@ -87,7 +87,7 @@ def get(settingFile=""):
     Return a setting file
     """
     if not settingFile in cycles:
-        logError("Setting file %s not found" % settingFile)
+        log.error("Setting file %s not found" % settingFile)
         exit()
 
     userSettings = importlib.import_module(__name__+"."+settingFile, package=None)
