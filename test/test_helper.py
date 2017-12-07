@@ -1,6 +1,4 @@
 from .. import helper
-import pytest
-
 
 
 def test_scale():
@@ -12,7 +10,7 @@ def test_scale():
 
 
 def test_sequenceResize():
-    data = [0,1,2,3,4,5,6,7,8,9]
+    data = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     assert helper.sequenceResize(data, 1) == [0]
     assert helper.sequenceResize(data, 10) == data
     assert helper.sequenceResize(data, 20) == [

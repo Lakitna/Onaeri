@@ -1,7 +1,5 @@
 from ..lookup import Lookup
 from ..settings import Template as testSettings
-from ..settings import Global as globalSettings
-import pytest
 
 """
 It's hard to make automatic testers for Lookup. Visual inspection of the
@@ -16,22 +14,21 @@ def test_init():
     assert type(l.color) is list
 
 
-
 def test_buildTable(capsys):
     data = {
         'day': 1,
         'night': 2,
-        'morning': (3,3),
-        'evening': (4,4)
+        'morning': (3, 3),
+        'evening': (4, 4)
     }
 
     testSettings.morningSlopeDuration = 60
     testSettings.eveningSlopeDuration = 60
     l = Lookup(testSettings)
-    result = l._buildTable(data, (0,100))
+    result = l._buildTable(data, (0, 100))
 
     with capsys.disabled():
-        expected_order = (2,3,1,4,2)
+        expected_order = (2, 3, 1, 4, 2)
         index = 0
         for val in result:
             # print(val, index)

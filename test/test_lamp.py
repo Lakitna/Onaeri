@@ -1,5 +1,4 @@
 from .. import lamp
-import pytest
 
 
 def test_set_get():

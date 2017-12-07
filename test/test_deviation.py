@@ -1,7 +1,7 @@
 from .. import cycle
 from ..settings import Template as testSettings
 from ..lamp import Lamp
-import pytest
+
 
 def test_settings():
     assert type(testSettings.userAlarmTime) is tuple

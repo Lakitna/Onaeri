@@ -1,6 +1,5 @@
 from ..observer import Observer
 from ..lamp import Lamp
-import pytest
 
 
 def test_init():
