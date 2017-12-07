@@ -6,7 +6,7 @@ https://github.com/Lakitna/Onaeri
 __version__ = '0.4.0'
 
 
-from .logger import *
+from .logger import log
 
 log("Onaeri API v%s" % __version__)
 

@@ -6,7 +6,7 @@ from .data import deviationData
 from .observer import Observer
 from .lamp import Lamp
 from . import settings
-from .logger import *
+from .logger import log
 
 
 class Cycle:
@@ -23,16 +23,16 @@ class Cycle:
         self.name = name
         self.update = False
 
-        self.settings = settings.get( self.name )
-        self.lookup = Lookup( self.settings )
+        self.settings = settings.get(self.name)
+        self.lookup = Lookup(self.settings)
 
         self.observer = {}
         self.deviation = {}
         self.lamp = {}
         self.prevLamp = {}
         for id in self.devices:
-            self.observer[id] = Observer( name )
-            self.deviation[id] = Deviation( self.settings )
+            self.observer[id] = Observer(name)
+            self.deviation[id] = Deviation(self.settings)
             self.lamp[id] = Lamp()
             self.prevLamp[id] = Lamp()
 
@@ -47,10 +47,10 @@ class Cycle:
 
         for id in self.devices:
             if not lampData is None:
-                self.observer[id].look( lampData[id] )
+                self.observer[id].look(lampData[id])
 
             if timeKeeper.update or self.observer[id].update:
-                newVals = self.lookup.table( timeKeeper.timeCode )
+                newVals = self.lookup.table(timeKeeper.timeCode)
                 newVals.name = id
 
                 if self.observer[id].update:
@@ -70,8 +70,8 @@ class Cycle:
                     self.observer[id].legalChange
                     self.deviation[id].reset()
                 else:
-                    newVals = self.deviation[id].apply( newVals )
-                    self.lamp[id] = self._compareWithPrevious( newVals, id )
+                    newVals = self.deviation[id].apply(newVals)
+                    self.lamp[id] = self._compareWithPrevious(newVals, id)
 
                 self.prevLamp[id].copy(newVals)
 
@@ -171,7 +171,8 @@ class Deviation:
             if changeVals.brightness is None:
                 self.setValues['brightness'] = dataVals.brightness
             else:
-                self.setValues['brightness'] = changeVals.brightness - dataVals.brightness
+                self.setValues['brightness'] = (changeVals.brightness
+                                                - dataVals.brightness)
 
             if not inRange(self.setValues['brightness'], (-10, 10)) \
                or not inRange(self.setValues['color'], (-10, 10)):
@@ -189,17 +190,19 @@ class Deviation:
 
             multiplier = self.table[self.counter] / 100
 
-            self.values['brightness'] = round(self.setValues['brightness'] * multiplier)
-            self.values['color'] = round(self.setValues['color'] * multiplier)
+            self.values['brightness'] = round(self.setValues['brightness']
+                                              * multiplier)
+            self.values['color'] = round(self.setValues['color']
+                                         * multiplier)
 
             newVals.brightness = limitTo(
-                                    newVals.brightness + self.values['brightness'],
-                                    settings.Global.valRange
-                                );
+                            newVals.brightness + self.values['brightness'],
+                            settings.Global.valRange
+                        );
             newVals.color = limitTo(
-                                    newVals.color + self.values['color'],
-                                    settings.Global.valRange
-                                );
+                            newVals.color + self.values['color'],
+                            settings.Global.valRange
+                        );
             self.counter += 1
 
         return newVals

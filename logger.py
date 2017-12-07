@@ -1,6 +1,9 @@
-import os, sys, time
+import os
+import sys
+import time
 
 __all__ = ["log"]
+
 
 class Logger:
     def __init__(self):
@@ -28,8 +31,10 @@ class Logger:
                 os.remove(path)
 
         # Check if daily logging folder exists and create if it doesn't
-        self.folderPath = '%s/%s'
-            % (self.folderPath, time.strftime(self.settings['datestamp']))
+        self.folderPath = '%s/%s' % (
+                                    self.folderPath,
+                                    time.strftime(self.settings['datestamp'])
+                                )
         if not os.path.exists(self.folderPath):
             os.makedirs(self.folderPath)
 
@@ -127,6 +132,9 @@ class Logger:
         self.__call__(self._hr)
 
     def _fileHeaders(self, name):
+        """
+        Build file headers
+        """
         return "%s\t%s\t%s\t%s\t%s\t%s\n" % (
             "Timestamp",
             "Brightness",
@@ -145,8 +153,8 @@ class Logger:
             name = self.settings['programLog']
             extention = ""
         else:
-            if not os.path.exists("%s/%s%s"
-                % (self.folderPath, name, extention)):
+            if not os.path.exists("%s/%s%s" % (
+                                  self.folderPath, name, extention)):
                 string = self._fileHeaders(name) + string
 
         with open("%s/%s%s" % (self.folderPath, name, extention), 'a') as f:
