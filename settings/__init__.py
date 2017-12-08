@@ -15,9 +15,9 @@ def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
     def _ruling(v, rnge):
         if not rnge[0] <= v <= rnge[1]:
             log.error(
-                    "Invalid setting. '%s' is not in allowed range (%s - %s)."
-                    % (val, rnge[0], rnge[1])
-                )
+                "Invalid setting. '%s' is not in allowed range (%s - %s)."
+                % (val, rnge[0], rnge[1])
+            )
             exit()
 
     if check is None:
@@ -82,8 +82,8 @@ def _settingFileList():
 
 cycles = _settingFileList()
 if len(cycles) == 0:
-    log.error("No setting files found. \
-        Please create a file in the `settings` folder using the Template.py.")
+    log.error("No setting files found. Please create a file " +
+              "in the `settings` folder using the Template.py.")
 
 
 def get(settingFile=""):
@@ -95,18 +95,18 @@ def get(settingFile=""):
         exit()
 
     userSettings = importlib.import_module(
-        __name__+"."+settingFile, package=None)
+        __name__ + "." + settingFile, package=None)
 
     # Some calculations on settings
     userSettings.eveningSlopeDuration = round(
-            userSettings.eveningSlopeDuration // Global.minPerTimeCode
-        )
+        userSettings.eveningSlopeDuration // Global.minPerTimeCode
+    )
     userSettings.morningSlopeDuration = round(
-            userSettings.morningSlopeDuration // Global.minPerTimeCode
-        )
+        userSettings.morningSlopeDuration // Global.minPerTimeCode
+    )
     userSettings.deviationDuration = round(
-            userSettings.deviationDuration // Global.minPerTimeCode
-        )
+        userSettings.deviationDuration // Global.minPerTimeCode
+    )
 
     userSettingsValidation(userSettings)
 
@@ -117,14 +117,14 @@ def userSettingsValidation(settings):
     """
     Check integrity of settings
     """
-    _checkIntegrity(settings.userAlarmTime, check="time")
-    _checkIntegrity(settings.userAlarmOffset, check="unsigned")
-    _checkIntegrity(settings.userSleepTime, check="time")
-    _checkIntegrity(settings.userWindDownTime, check="unsigned")
-    _checkIntegrity(settings.briCorrect, 0, 100)
+    _checkIntegrity(settings.alarmTime, check="time")
+    _checkIntegrity(settings.alarmOffset, check="unsigned")
+    _checkIntegrity(settings.sleepTime, check="time")
+    _checkIntegrity(settings.windDownTime, check="unsigned")
+    _checkIntegrity(settings.brightnessCorrect, 0, 100)
     _checkIntegrity(settings.colorCorrect, 0, 100)
     _checkIntegrity(settings.morningSlopeDuration, check="unsigned")
     _checkIntegrity(settings.eveningSlopeDuration, check="unsigned")
     _checkIntegrity(settings.deviationDuration, check="unsigned")
-    _checkIntegrity(settings.automaticPowerOff, check="boolean")
-    _checkIntegrity(settings.automaticPowerOn, check="boolean")
+    _checkIntegrity(settings.autoPowerOff, check="boolean")
+    _checkIntegrity(settings.autoPowerOn, check="boolean")

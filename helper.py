@@ -6,12 +6,14 @@ def scale(val, inRange, outRange, decimals=0):
         return None
 
     ret = (
-            ((val - inRange[0]) / (inRange[1] - inRange[0]))
-            * (outRange[1] - outRange[0])
-            + outRange[0]
-        )
+        ((val - inRange[0]) / (inRange[1] - inRange[0]))
+        * (outRange[1] - outRange[0])
+        + outRange[0]
+    )
 
     if ret % 1 == 0:
+        ret = round(ret)
+    elif decimals == 0:
         ret = round(ret)
     else:
         ret = round(ret, decimals)
@@ -27,9 +29,9 @@ def sequenceResize(source, length):
     sourceLen = len(source)
     out = []
     for i in range(length):
-        key = int(i * (sourceLen/length))
+        key = int(i * (sourceLen / length))
         if key >= sourceLen:
-            key = sourceLen-1
+            key = sourceLen - 1
 
         out.append(source[key])
     return out

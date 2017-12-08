@@ -9,7 +9,7 @@ class TimeKeeper:
     """
     def __init__(self):
         self._minPerTimeCode = settings.Global.minPerTimeCode
-        self.timeCode = self.makeCode()
+        self.latestCode = self.code()
         self.update = True
         self.runtime = 0
 
@@ -17,13 +17,13 @@ class TimeKeeper:
         """
         Progress the timekeeper and set update flag on timeCode change.
         """
-        if self.timeCode == self.makeCode():
+        if self.timeCode == self.code():
             self.update = False
         else:
             self.update = True
             self.runtime += 1
 
-    def makeCode(self, h=None, m=None, s=None, dry=False):
+    def code(self, h=None, m=None, s=None, dry=False):
         """
         Calculate a new timecode
         """
@@ -46,13 +46,13 @@ class TimeKeeper:
                 m = h[1]
             h = h[0]
 
-        ret = math.floor(((h*60) + m + (s/60)) / self._minPerTimeCode)
+        ret = math.floor(((h * 60) + m + (s / 60)) / self._minPerTimeCode)
         if not dry:
             self.timeCode = ret
         return ret
 
     @property
-    def timeStamp(self):
+    def timestamp(self):
         """
         Return the timestring of a timecode
         """

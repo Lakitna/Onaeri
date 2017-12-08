@@ -7,13 +7,13 @@ __all__ = ["log"]
 class Logger:
     def __init__(self):
         self.settings = {
-                "folder": "log",
-                "extention": ".tsv",
-                "programLog": "main.log",
-                "timestamp": "%H:%M:%S",
-                "datestamp": "%d-%m-%Y",
-                "keepLogsFor": 30  # in days
-            }
+            "folder": "log",
+            "extention": ".tsv",
+            "programLog": "main.log",
+            "timestamp": "%H:%M:%S",
+            "datestamp": "%d-%m-%Y",
+            "keepLogsFor": 30  # in days
+        }
         self._hr = "—" * 50
 
         # Check if main logging folder exists and create if it doesn't
@@ -31,9 +31,9 @@ class Logger:
 
         # Check if daily logging folder exists and create if it doesn't
         self.folderPath = '%s/%s' % (
-                                    self.folderPath,
-                                    time.strftime(self.settings['datestamp'])
-                                )
+            self.folderPath,
+            time.strftime(self.settings['datestamp'])
+        )
         if not os.path.exists(self.folderPath):
             os.makedirs(self.folderPath)
 
@@ -118,7 +118,8 @@ class Logger:
                 self.__call__("%s:" % key)
                 for subkey in values[key]:
                     self.__call__("\t%s:\t\t%s" % (
-                                    subkey, values[key][subkey]))
+                        subkey, values[key][subkey])
+                    )
             else:
                 self.__call__("%s:\t\t%s" % (key, values[key]))
         self.__call__()
@@ -162,13 +163,13 @@ class Logger:
     def _stringReplace(self, string):
         string = string.replace("[datetime]", "[date] [time]")
         string = string.replace(
-                "[time]",
-                time.strftime(self.settings['timestamp'])
-            )
+            "[time]",
+            time.strftime(self.settings['timestamp'])
+        )
         string = string.replace(
-                "[date]",
-                time.strftime(self.settings['datestamp'])
-            )
+            "[date]",
+            time.strftime(self.settings['datestamp'])
+        )
 
         return string
 

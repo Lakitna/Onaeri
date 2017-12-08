@@ -31,8 +31,8 @@ class Onaeri:
                 if cycleName.lower() in l.name.lower():
                     lamps[l.name] = l
             self.cycles.append(
-                    Cycle(cycleName, lamps)
-                )
+                Cycle(cycleName, lamps, self.time)
+            )
 
     def tick(self, lampDataList=None):
         """
@@ -49,17 +49,17 @@ class Onaeri:
                     if cycle.name.lower() in lamp.name.lower():
                         lampData[lamp.name] = lamp
 
-            if cycle.tick(self.time, lampData):
+            if cycle.tick(lampData):
                 self.update = True
 
             if self.time.update:
                 for id in cycle.lamp:
                     log.blind("[time]\t%s\t%s\t%s\t%s\t%s" % (
-                            cycle.observer[id].data.brightness,
-                            cycle.observer[id].data.color,
-                            cycle.observer[id].data.power,
-                            cycle.observer[id].update,
-                            cycle.deviation[id].active
-                        ), id)
+                        cycle.observer[id].data.brightness,
+                        cycle.observer[id].data.color,
+                        cycle.observer[id].data.power,
+                        cycle.observer[id].update,
+                        cycle.deviation[id].active
+                    ), id)
 
         self.time.tick()

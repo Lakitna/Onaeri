@@ -1,5 +1,4 @@
 import time
-from .timekeeper import TimeKeeper
 from .lookup import Lookup
 from .helper import sequenceResize, inRange, limitTo
 from . import data
@@ -13,7 +12,7 @@ class Cycle:
     """
     Cycle a group of lamps
     """
-    def __init__(self, name, devices):
+    def __init__(self, name, devices, timeKeeper):
         log("Setting up cycle named %s: " % name, end="", flush=True)
 
         if len(devices) == 0:
@@ -25,6 +24,7 @@ class Cycle:
 
         self.settings = settings.get(self.name)
         self.lookup = Lookup(self.settings)
+        self.time = timeKeeper
 
         self.observer = {}
         self.deviation = {}
@@ -38,7 +38,7 @@ class Cycle:
 
         log.success("Done")
 
-    def tick(self, timeKeeper, lampData):
+    def tick(self, lampData):
         """
         Progress cycle.
         """
@@ -48,8 +48,8 @@ class Cycle:
             if lampData is not None:
                 self.observer[id].look(lampData[id])
 
-            if timeKeeper.update or self.observer[id].update:
-                newVals = self.lookup.table(timeKeeper.timeCode)
+            if self.time.update or self.observer[id].update:
+                newVals = self.lookup.table(self.time.latestCode)
                 newVals.name = id
 
                 if self.observer[id].update:
@@ -89,9 +89,9 @@ class Cycle:
                 lamp.power = new.power
 
             if lamp.power is not None:
-                if not self.settings.automaticPowerOff and lamp.power is False:
+                if not self.settings.autoPowerOff and lamp.power is False:
                     lamp.power = None
-                if not self.settings.automaticPowerOn and lamp.power is True:
+                if not self.settings.autoPowerOn and lamp.power is True:
                     lamp.power = None
 
                 if lamp.power is True:
@@ -190,13 +190,13 @@ class Deviation:
                                          * multiplier)
 
             newVals.brightness = limitTo(
-                            newVals.brightness + self.values['brightness'],
-                            settings.Global.valRange
-                        )
+                newVals.brightness + self.values['brightness'],
+                settings.Global.valRange
+            )
             newVals.color = limitTo(
-                            newVals.color + self.values['color'],
-                            settings.Global.valRange
-                        )
+                newVals.color + self.values['color'],
+                settings.Global.valRange
+            )
             self.counter += 1
 
         return newVals

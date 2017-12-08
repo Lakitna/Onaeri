@@ -4,7 +4,7 @@ from ..lamp import Lamp
 
 
 def test_settings():
-    assert type(testSettings.userAlarmTime) is tuple
+    assert type(testSettings.alarmTime) is tuple
 
 
 def test_init():
