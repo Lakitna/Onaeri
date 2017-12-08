@@ -14,7 +14,7 @@ class Logger:
             "datestamp": "%d-%m-%Y",
             "keepLogsFor": 30  # in days
         }
-        self._hr = "—" * 50
+        self._hr = "─" * 50
 
         # Check if main logging folder exists and create if it doesn't
         path = os.path.dirname(os.path.abspath(__file__))

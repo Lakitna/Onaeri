@@ -27,8 +27,7 @@ class Lookup:
 
         # Create morning and evening slopes based on sleep rhythm settings
         self._morningSlope = [0, 0]
-        self._morningSlope[0] = (self._alarmTime
-                                 - self._alarmOffset)
+        self._morningSlope[0] = (self._alarmTime - self._alarmOffset)
         self._morningSlope[1] = (self._morningSlope[0]
                                  + self.config.morningSlopeDuration)
 
