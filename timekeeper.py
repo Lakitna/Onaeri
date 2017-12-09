@@ -17,7 +17,7 @@ class TimeKeeper:
         """
         Progress the timekeeper and set update flag on timeCode change.
         """
-        if self.timeCode == self.code():
+        if self.latestCode == self.code():
             self.update = False
         else:
             self.update = True
@@ -48,7 +48,7 @@ class TimeKeeper:
 
         ret = math.floor(((h * 60) + m + (s / 60)) / self._minPerTimeCode)
         if not dry:
-            self.timeCode = ret
+            self.latestCode = ret
         return ret
 
     @property
@@ -56,7 +56,7 @@ class TimeKeeper:
         """
         Return the timestring of a timecode
         """
-        minutes = self.timeCode * self._minPerTimeCode
+        minutes = self.latestCode * self._minPerTimeCode
         h = math.floor(minutes / 60)
         m = math.floor(minutes % 60)
         s = math.floor((minutes % 1) * 60)

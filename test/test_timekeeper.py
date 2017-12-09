@@ -4,7 +4,7 @@ from ..timekeeper import TimeKeeper
 def test_tick():
     t = TimeKeeper()
     t._minPerTimeCode = 1
-    t.timeCode = 0
+    t.latestCode = 0
     assert t.runtime == 0
 
     t.tick()
