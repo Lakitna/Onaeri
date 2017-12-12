@@ -93,16 +93,16 @@ class Cycle:
         return self.update
 
     def _applyDynamicSettings(self, id):
+        """
+        Apply some dynamic settings
+        """
         dynamicSettings = settings.dynamic.get(id, ['max', 'min'])
         if self.lamp[id].brightness is not None:
-            self.lamp[id].brightness = round(
-                self.lamp[id].brightness
-                * scale(
-                    dynamicSettings['max']['brightness'],
-                    (settings.Global.valRange),
-                    (0, 1),
-                    decimals=2
-                )
+            self.lamp[id].brightness = scale(
+                self.lamp[id].brightness,
+                (settings.Global.valRange),
+                (dynamicSettings['min']['brightness'],
+                 dynamicSettings['max']['brightness'])
             )
         if self.lamp[id].color is not None:
             self.lamp[id].color = scale(

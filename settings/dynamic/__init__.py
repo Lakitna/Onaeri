@@ -1,6 +1,5 @@
 import json
 import os
-import sys
 import time
 from ...logger import log
 from .. import Global
@@ -94,6 +93,7 @@ def set(id, group, data, keys=None):
     else:
         log.error("[Settings][Dynamic] Unexpected datatype provided")
         log("Data provided:")
+        log("type: %s" % type(data))
         log(data)
         exit()
 
