@@ -14,28 +14,6 @@ fileTemplate = {
 }
 
 
-# Remove old files
-files = [f for f in os.listdir(folderPath)
-         if os.path.isfile(os.path.join(folderPath, f))
-         and not f.startswith(".") and f not in blacklist]
-for f in files:
-    remove = False
-    path = os.path.join(folderPath, f)
-
-    try:
-        content = json.load(open(path))
-    except json.decoder.JSONDecodeError:
-        remove = True
-
-    if content['meta']['called'] < (time.time() - (30 * 86400)):
-        if not content['meta']['called'] == 0:
-            remove = True
-
-    if remove and f.endswith(expectedExtention):
-        os.remove(path)
-        log("Removed dynamic settings file `%s`." % f)
-
-
 def get(id, groups=None):
     filePath = "%s/%s.%s" % (folderPath, id, expectedExtention)
     try:
@@ -104,3 +82,33 @@ def _reset(id):
     filePath = "%s/%s.%s" % (folderPath, id, expectedExtention)
     with open(filePath, 'w') as f:
         f.write(json.dumps(fileTemplate))
+
+
+def _cleanup(days=Global.dynamicSettingsKeep):
+    """
+    Remove old dynamic settings
+    """
+    files = [f for f in os.listdir(folderPath)
+             if os.path.isfile(os.path.join(folderPath, f))
+             and not f.startswith(".") and f not in blacklist]
+    for f in files:
+        if f.endswith(expectedExtention):
+            remove = False
+            path = os.path.join(folderPath, f)
+
+            try:
+                content = json.load(open(path))
+            except json.decoder.JSONDecodeError:
+                # Can't parse the file as JSON, so lets toss it.
+                remove = True
+            else:
+                if content['meta']['called'] < (time.time() - (days * 86400)):
+                    if not content['meta']['called'] == 0:
+                        remove = True
+
+            if remove:
+                os.remove(path)
+                log("[Cleanup] Removed dynamic settings file `%s`." % f)
+
+
+_cleanup()

@@ -14,7 +14,6 @@ minPerTimeCode = .5
 valRange = (0, 1000)
 
 
-
 """
 Advanced settings
 """
@@ -25,4 +24,7 @@ commandsTries = 3
 settingFileExtention = '.py'
 
 # Total amount of timecodes in a day, calculated unsigned int.
-totalDataPoints = round((24*60) // minPerTimeCode)
+totalDataPoints = round((24 * 60) // minPerTimeCode)
+
+# Days to keep dynamic setting files without it being used, unsigned int.
+dynamicSettingsKeep = 30
