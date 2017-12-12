@@ -16,7 +16,6 @@ class Lookup:
         self.time = TimeKeeper()
         self.config = config
         self.lamp = Lamp()
-        self.isNight = False
 
         # Sleep rhythm settings
         self._alarmTime = self.time.code(self.config.alarmTime)
@@ -26,7 +25,7 @@ class Lookup:
         self._windDownTime = self.time.code(m=self.config.windDownTime)
 
         # Create morning and evening slopes based on sleep rhythm settings
-        self._morningSlope = [0, 0]
+        self._morningSlope = [0, 0, 0, 0]
         self._morningSlope[0] = (self._alarmTime - self._alarmOffset)
         self._morningSlope[1] = (self._morningSlope[0]
                                  + self.config.morningSlopeDuration)
@@ -35,13 +34,16 @@ class Lookup:
         self._eveningSlope[0] = (self._sleepTime
                                  - self.config.eveningSlopeDuration)
         self._eveningSlope[1] = self._sleepTime
-        self._eveningSlope[2] = self._eveningSlope[0]
         if self._eveningSlope[0] < 0:
-            self._eveningSlope[0] = 0
-            self._eveningSlope[2] += settings.Global.totalDataPoints
-            self._eveningSlope[3] = settings.Global.totalDataPoints
+            self._eveningSlope[2] = 0
+            self._eveningSlope[3] = self._sleepTime
+
+            self._eveningSlope[0] = (self._eveningSlope[0]
+                                     + settings.Global.totalDataPoints)
+            self._eveningSlope[1] = settings.Global.totalDataPoints
 
         # Build lookup tables
+        self.anatomy = self._buildAnatomy()
         self.brightness = self._buildTable(
             data.brightness,
             self.config.brightnessCorrect
@@ -54,6 +56,9 @@ class Lookup:
         # print(self.brightness)
         # print()
         # print(self.color)
+        # print()
+        # print(self.anatomy)
+        # print("\n" * 10)
         # exit()
 
     def table(self, timeCode):
@@ -78,26 +83,41 @@ class Lookup:
         else:
             self.lamp.power = None
 
-        self.isNight = self._isNight(timeCode)
-
-        if self.isNight:
+        period = self.period
+        if period == 'night':
             self.lamp.mode = 'dark'
         else:
             self.lamp.mode = None
 
         return self.lamp
 
-    def _isNight(self, timeCode=None):
+    @property
+    def period(self, timeCode=None):
         if timeCode is None:
             timeCode = self.time.code()
 
-        if timeCode in range((self._sleepTime - self._windDownTime),
-                             settings.Global.totalDataPoints):
-            return True
-        if timeCode in range(0,
-                             (self._alarmTime - self._alarmOffset)):
-            return True
-        return False
+        for period in self.anatomy:
+            for sub in self.anatomy[period]:
+                if timeCode in range(sub[0], sub[1]):
+                    return period
+
+    def _buildAnatomy(self):
+        anatomy = {
+            "morning": [(self._morningSlope[0], self._morningSlope[1]),
+                        (self._morningSlope[2], self._morningSlope[3])],
+            "day": [(self._morningSlope[1], self._eveningSlope[0]),
+                    (0, 0)],
+            "evening": [(self._eveningSlope[0], self._eveningSlope[1]),
+                        (self._eveningSlope[2], self._eveningSlope[3])],
+            "night": [(self._eveningSlope[1], settings.Global.totalDataPoints),
+                      (self._eveningSlope[3], self._morningSlope[0])]
+        }
+
+        for phase in anatomy:
+            for partial in anatomy[phase]:
+                if partial[0] == partial[1]:
+                    anatomy[phase].remove(partial)
+        return anatomy
 
     def _buildTable(self, source, sourceRange):
         """
@@ -138,7 +158,7 @@ class Lookup:
                                     sourceRange,
                                     decimals=1)
 
-        for timeCode in range(self._morningSlope[1], self._eveningSlope[2]):
+        for timeCode in range(self._morningSlope[1], self._eveningSlope[0]):
             table[timeCode] = scale(source['day'],
                                     (0, 100),
                                     sourceRange)

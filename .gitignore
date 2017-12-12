@@ -9,6 +9,9 @@ settings/Sander.py
 settings/Jurrien.py
 settings/Hallway.py
 
+# Dynamic settings
+settings/dynamic/*.json
+
 # log files
 log
 

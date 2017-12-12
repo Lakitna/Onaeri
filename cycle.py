@@ -1,6 +1,6 @@
 import time
 from .lookup import Lookup
-from .helper import sequenceResize, inRange, limitTo
+from .helper import sequenceResize, inRange, limitTo, scale
 from . import data
 from .observer import Observer
 from .lamp import Lamp
@@ -53,7 +53,23 @@ class Cycle:
                 newVals.name = id
 
                 if self.observer[id].update:
-                    self.deviation[id].change(newVals, self.observer[id].data)
+                    if self.lookup.period == 'day':
+                        settings.dynamic.set(
+                            id,
+                            'max',
+                            self.observer[id].data(),
+                            keys=['brightness', 'color']
+                        )
+                    elif self.lookup.period == 'night':
+                        settings.dynamic.set(
+                            id,
+                            'min',
+                            self.observer[id].data(),
+                            keys=['brightness', 'color']
+                        )
+                    elif self.lookup.period == 'evening':
+                        self.deviation[id].change(newVals,
+                                                  self.observer[id].data)
 
                 if self.observer[id].turnedOff:
                     self.lamp[id].power = False
@@ -71,9 +87,30 @@ class Cycle:
                     newVals = self.deviation[id].apply(newVals)
                     self.lamp[id] = self._compareWithPrevious(newVals, id)
 
+                self._applyDynamicSettings(id)
                 self.prevLamp[id].copy(newVals)
 
         return self.update
+
+    def _applyDynamicSettings(self, id):
+        dynamicSettings = settings.dynamic.get(id, ['max', 'min'])
+        if self.lamp[id].brightness is not None:
+            self.lamp[id].brightness = round(
+                self.lamp[id].brightness
+                * scale(
+                    dynamicSettings['max']['brightness'],
+                    (settings.Global.valRange),
+                    (0, 1),
+                    decimals=2
+                )
+            )
+        if self.lamp[id].color is not None:
+            self.lamp[id].color = scale(
+                self.lamp[id].color,
+                (settings.Global.valRange),
+                (dynamicSettings['min']['color'],
+                 dynamicSettings['max']['color'])
+            )
 
     def _compareWithPrevious(self, new, id):
         """
