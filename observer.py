@@ -17,17 +17,15 @@ class Observer:
         self._cycleName = cycleName
         self._legalChange = True
 
-
     def __str__(self):
         """
         Return public vars in dict-string
         """
         ret = {}
         for var in self.__dict__:
-            if not "_" in var:
+            if "_" not in var:
                 ret[var] = getattr(self, var)
         return str(ret)
-
 
     def look(self, newData):
         """
@@ -36,15 +34,15 @@ class Observer:
         self.update = False
 
         # If observer recieved meaningfull data
-        if not newData is None:
+        if newData is not None:
             self.turnedOn = False
             self.turnedOff = False
-            if self.data.power == False and newData.power == True:
+            if self.data.power is False and newData.power is True:
                 self.turnedOn = True
-            if self.data.power == True and newData.power == False:
+            if self.data.power is True and newData.power is False:
                 self.turnedOff = True
 
-            newData.color      = limitTo(newData.color, valRange)
+            newData.color = limitTo(newData.color, valRange)
             newData.brightness = limitTo(newData.brightness, valRange)
 
             if not self._legalChange:
@@ -54,7 +52,6 @@ class Observer:
 
             self._legalChange = False
 
-
     @property
     def legalChange(self):
         """
@@ -62,15 +59,23 @@ class Observer:
         """
         self._legalChange = True
 
-
     def _sameData(self, new, prev):
         """
-        Compare new to previous lamp values. Returns lamp object and sets update flag.
+        Compare new to previous lamp values.
+        Returns lamp object and sets update flag.
         """
-        lamp = new
-
         if not prev == new:
-            logHighlight("[Observer] Illegal change detected:")
-            logHighlight("\t%s: %s" % (self._cycleName, new))
+            lamp = Lamp()
+            lamp.copy(new)
+
+            if lamp.brightness == prev.brightness:
+                lamp.brightness = None
+            if lamp.color == prev.color:
+                lamp.color = None
+            if lamp.power == prev.power:
+                lamp.power = None
+
+            log.highlight("[[time]] Change detected in %s: %s"
+                          % (self._cycleName, lamp))
             self.update = True
         return new
