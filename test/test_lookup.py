@@ -25,7 +25,7 @@ def test_buildTable(capsys):
     testSettings.morningSlopeDuration = 60
     testSettings.eveningSlopeDuration = 60
     l = Lookup(testSettings)
-    result = l._buildTable(data, (0, 100))
+    result = l._buildTable(data)
 
     with capsys.disabled():
         expected_order = (2, 3, 1, 4, 2)
