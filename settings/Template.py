@@ -13,12 +13,6 @@ autoPowerOff = True
 autoPowerOn = True
 
 
-# Lamp brightness adjust in percentages.
-brightnessCorrect = (0, 100)
-# Lamp color adjust in percentages.
-colorCorrect = (0, 100)
-
-
 # How many minutes before your alarm time should the lamps go on?
 alarmOffset = 30
 # How many minutes before your bedtime should the lamps notify you?
