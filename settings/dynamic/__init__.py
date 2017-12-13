@@ -18,12 +18,9 @@ def get(id, groups=None):
     filePath = "%s/%s.%s" % (folderPath, id, expectedExtention)
     try:
         content = json.load(open(filePath))
-    except FileNotFoundError:
+    except (FileNotFoundError, json.decoder.JSONDecodeError):
         _reset(id)
-        return None
-    except json.decoder.JSONDecodeError:
-        _reset(id)
-        return None
+        return fileTemplate
 
     ret = {}
     if groups is not None:
