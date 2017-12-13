@@ -9,7 +9,7 @@ from ..logger import log
 blacklist = ["Global", "Template", "__init__"]
 
 
-def _checkIntegrity(val, rmin=0, rmax=1, *, check=None, tag=None):
+def _checkIntegrity(val, rnge=(0, 1), *, check=None, tag=None):
     """
     Check value range and exit() on problems.
     """
@@ -19,46 +19,37 @@ def _checkIntegrity(val, rmin=0, rmax=1, *, check=None, tag=None):
 
     def _ruling(v, rnge):
         if not rnge[0] <= v <= rnge[1]:
-            log.error(
-                "%sInvalid setting. '%s' is not in allowed range (%s - %s)."
-                % (prefix, val, rnge[0], rnge[1])
-            )
+            log.error("%sInvalid setting. " +
+                      "'%s' is not in allowed range (%s - %s)."
+                      % (prefix, v, rnge[0], rnge[1]))
             exit()
 
-    if check is None:
-        if type(val) is list or type(val) is tuple:
-            for v in val:
-                _ruling(v, (rmin, rmax))
-        else:
-            _ruling(val, (rmin, rmax))
-    elif check is "unsigned":
-        if not val >= 0:
-            log.error("%sInvalid setting. " +
-                      "'%s' is not in allowed range (%s - ∞)."
-                      % (prefix, val, rmin))
-            exit()
-    elif check is "string":
-        if not type(val) is str:
-            log.error("%sInvalid setting. '%s' is not a string."
-                      % (prefix, val))
-            exit()
-    elif check is "boolean":
-        if not type(val) is bool:
-            log.error("%sInvalid setting. '%s' is not boolean."
-                      % (prefix, val))
-            exit()
-    elif check is "time":
-        _ruling(val[0], (0, 23))
-        _ruling(val[1], (0, 59))
-    elif check is "lampVal":
-        _ruling(val, Global.valRange)
-    elif check is "dataVal":
-        if type(val) is list or type(val) is tuple:
-            for v in val:
-                _ruling(v, Global.dataRange)
-    else:
-        log.error("%sCheck `%s` could not be performed." % (prefix, check))
-        exit()
+    if type(val) is not list and type(val) is not tuple:
+        if check is "string":
+            if not type(val) is str:
+                log.error("%sInvalid setting. '%s' is not a string."
+                          % (prefix, val))
+                exit()
+        elif check is "boolean":
+            if not type(val) is bool:
+                log.error("%sInvalid setting. '%s' is not boolean."
+                          % (prefix, val))
+                exit()
+        elif check is "time":
+            _ruling(val[0], (0, 23))
+            _ruling(val[1], (0, 59))
+
+        val = [val]
+
+    for v in val:
+        if check is None:
+            _ruling(v, rnge)
+        elif check is "unsigned":
+            if not v >= 0:
+                log.error("%sInvalid setting. " +
+                          "'%s' is not in allowed range (0 - ∞)."
+                          % (prefix, v))
+                exit()
 
 
 _checkIntegrity(Global.minPerTimeCode, check="unsigned", tag="Global")
@@ -67,31 +58,29 @@ _checkIntegrity(Global.totalDataPoints, check="unsigned", tag="Global")
 _checkIntegrity(Global.commandsTries, check="unsigned", tag="Global")
 _checkIntegrity(Global.mainLoopDelay, check="unsigned", tag="Global")
 _checkIntegrity(Global.settingFileExtention, check="string", tag="Global")
-_checkIntegrity(Global.valRange[0], check="unsigned", tag="Global")
-_checkIntegrity(Global.valRange[1], check="unsigned", tag="Global")
-_checkIntegrity(Global.dataRange[0], check="unsigned", tag="Global")
-_checkIntegrity(Global.dataRange[1], check="unsigned", tag="Global")
+_checkIntegrity(Global.valRange, check="unsigned", tag="Global")
+_checkIntegrity(Global.dataRange, check="unsigned", tag="Global")
 
-_checkIntegrity(data.brightness['day'], check="dataVal", tag="Data")
-_checkIntegrity(data.brightness['night'], check="dataVal", tag="Data")
-_checkIntegrity(data.brightness['morning'], check="dataVal", tag="Data")
-_checkIntegrity(data.brightness['evening'], check="dataVal", tag="Data")
-_checkIntegrity(data.color['day'], check="dataVal", tag="Data")
-_checkIntegrity(data.color['night'], check="dataVal", tag="Data")
-_checkIntegrity(data.color['morning'], check="dataVal", tag="Data")
-_checkIntegrity(data.color['evening'], check="dataVal", tag="Data")
-_checkIntegrity(data.deviation, check="dataVal", tag="Data")
+_checkIntegrity(data.brightness['day'], Global.dataRange, tag="Data")
+_checkIntegrity(data.brightness['night'], Global.dataRange, tag="Data")
+_checkIntegrity(data.brightness['morning'], Global.dataRange, tag="Data")
+_checkIntegrity(data.brightness['evening'], Global.dataRange, tag="Data")
+_checkIntegrity(data.color['day'], Global.dataRange, tag="Data")
+_checkIntegrity(data.color['night'], Global.dataRange, tag="Data")
+_checkIntegrity(data.color['morning'], Global.dataRange, tag="Data")
+_checkIntegrity(data.color['evening'], Global.dataRange, tag="Data")
+_checkIntegrity(data.deviation, Global.dataRange, tag="Data")
 
 for id in dynamic.list():
     settings = dynamic.get(id)
-    _checkIntegrity(settings['min']['brightness'],
-                    check="lampVal", tag="Dynamic|%s" % id)
-    _checkIntegrity(settings['min']['color'],
-                    check="lampVal", tag="Dynamic|%s" % id)
-    _checkIntegrity(settings['max']['brightness'],
-                    check="lampVal", tag="Dynamic|%s" % id)
-    _checkIntegrity(settings['max']['color'],
-                    check="lampVal", tag="Dynamic|%s" % id)
+    _checkIntegrity(settings['min']['brightness'], Global.valRange,
+                    tag="Dynamic|%s" % id)
+    _checkIntegrity(settings['min']['color'], Global.valRange,
+                    tag="Dynamic|%s" % id)
+    _checkIntegrity(settings['max']['brightness'], Global.valRange,
+                    tag="Dynamic|%s" % id)
+    _checkIntegrity(settings['max']['color'], Global.valRange,
+                    tag="Dynamic|%s" % id)
 
 
 def _settingFileList():
