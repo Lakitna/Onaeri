@@ -59,8 +59,16 @@ class Lookup:
         """
         Get lamp values associated with timecode. Returns lamp object
         """
-        self.lamp.color = self.color[timeCode]
-        self.lamp.brightness = self.brightness[timeCode]
+        self.lamp.color = scale(
+            self.color[timeCode],
+            settings.Global.dataRange,
+            settings.Global.valRange
+        )
+        self.lamp.brightness = scale(
+            self.brightness[timeCode],
+            settings.Global.dataRange,
+            settings.Global.valRange
+        )
 
         if timeCode == (self._alarmTime - self._alarmOffset):
             self.lamp.power = True

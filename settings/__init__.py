@@ -9,15 +9,19 @@ from ..logger import log
 blacklist = ["Global", "Template", "__init__"]
 
 
-def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
+def _checkIntegrity(val, rmin=0, rmax=1, *, check=None, tag=None):
     """
     Check value range and exit() on problems.
     """
+    prefix = ""
+    if tag is not None:
+        prefix = "[%s] " % tag
+
     def _ruling(v, rnge):
         if not rnge[0] <= v <= rnge[1]:
             log.error(
-                "Invalid setting. '%s' is not in allowed range (%s - %s)."
-                % (val, rnge[0], rnge[1])
+                "%sInvalid setting. '%s' is not in allowed range (%s - %s)."
+                % (prefix, val, rnge[0], rnge[1])
             )
             exit()
 
@@ -29,41 +33,65 @@ def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
             _ruling(val, (rmin, rmax))
     elif check is "unsigned":
         if not val >= 0:
-            log.error("Invalid setting. '%s' is not in allowed range (%s - ∞)."
-                      % (val, rmin))
+            log.error("%sInvalid setting. " +
+                      "'%s' is not in allowed range (%s - ∞)."
+                      % (prefix, val, rmin))
             exit()
     elif check is "string":
         if not type(val) is str:
-            log.error("Invalid setting. '%s' is not a string." % (val))
+            log.error("%sInvalid setting. '%s' is not a string."
+                      % (prefix, val))
             exit()
     elif check is "boolean":
         if not type(val) is bool:
-            log.error("Invalid setting. '%s' is not boolean." % (val))
+            log.error("%sInvalid setting. '%s' is not boolean."
+                      % (prefix, val))
             exit()
     elif check is "time":
         _ruling(val[0], (0, 23))
         _ruling(val[1], (0, 59))
+    elif check is "lampVal":
+        _ruling(val, Global.valRange)
+    elif check is "dataVal":
+        if type(val) is list or type(val) is tuple:
+            for v in val:
+                _ruling(v, Global.dataRange)
     else:
-        log.error("Check `%s` could not be performed." % check)
+        log.error("%sCheck `%s` could not be performed." % (prefix, check))
         exit()
 
 
-_checkIntegrity(Global.minPerTimeCode, check="unsigned")
-_checkIntegrity(Global.transitionTime, check="unsigned")
-_checkIntegrity(Global.totalDataPoints, check="unsigned")
-_checkIntegrity(Global.commandsTries, check="unsigned")
-_checkIntegrity(Global.mainLoopDelay, check="unsigned")
-_checkIntegrity(Global.settingFileExtention, check="string")
+_checkIntegrity(Global.minPerTimeCode, check="unsigned", tag="Global")
+_checkIntegrity(Global.transitionTime, check="unsigned", tag="Global")
+_checkIntegrity(Global.totalDataPoints, check="unsigned", tag="Global")
+_checkIntegrity(Global.commandsTries, check="unsigned", tag="Global")
+_checkIntegrity(Global.mainLoopDelay, check="unsigned", tag="Global")
+_checkIntegrity(Global.settingFileExtention, check="string", tag="Global")
+_checkIntegrity(Global.valRange[0], check="unsigned", tag="Global")
+_checkIntegrity(Global.valRange[1], check="unsigned", tag="Global")
+_checkIntegrity(Global.dataRange[0], check="unsigned", tag="Global")
+_checkIntegrity(Global.dataRange[1], check="unsigned", tag="Global")
 
-_checkIntegrity(data.brightness['day'], 0, 1000)
-_checkIntegrity(data.brightness['night'], 0, 1000)
-_checkIntegrity(data.brightness['morning'], 0, 1000)
-_checkIntegrity(data.brightness['evening'], 0, 1000)
-_checkIntegrity(data.color['day'], 0, 1000)
-_checkIntegrity(data.color['night'], 0, 1000)
-_checkIntegrity(data.color['morning'], 0, 1000)
-_checkIntegrity(data.color['evening'], 0, 1000)
-_checkIntegrity(data.deviation, 0, 1000)
+_checkIntegrity(data.brightness['day'], check="dataVal", tag="Data")
+_checkIntegrity(data.brightness['night'], check="dataVal", tag="Data")
+_checkIntegrity(data.brightness['morning'], check="dataVal", tag="Data")
+_checkIntegrity(data.brightness['evening'], check="dataVal", tag="Data")
+_checkIntegrity(data.color['day'], check="dataVal", tag="Data")
+_checkIntegrity(data.color['night'], check="dataVal", tag="Data")
+_checkIntegrity(data.color['morning'], check="dataVal", tag="Data")
+_checkIntegrity(data.color['evening'], check="dataVal", tag="Data")
+_checkIntegrity(data.deviation, check="dataVal", tag="Data")
+
+for id in dynamic.list():
+    settings = dynamic.get(id)
+    _checkIntegrity(settings['min']['brightness'],
+                    check="lampVal", tag="Dynamic|%s" % id)
+    _checkIntegrity(settings['min']['color'],
+                    check="lampVal", tag="Dynamic|%s" % id)
+    _checkIntegrity(settings['max']['brightness'],
+                    check="lampVal", tag="Dynamic|%s" % id)
+    _checkIntegrity(settings['max']['color'],
+                    check="lampVal", tag="Dynamic|%s" % id)
 
 
 def _settingFileList():
@@ -118,12 +146,14 @@ def userSettingsValidation(settings):
     """
     Check integrity of settings
     """
-    _checkIntegrity(settings.alarmTime, check="time")
-    _checkIntegrity(settings.alarmOffset, check="unsigned")
-    _checkIntegrity(settings.sleepTime, check="time")
-    _checkIntegrity(settings.windDownTime, check="unsigned")
-    _checkIntegrity(settings.morningSlopeDuration, check="unsigned")
-    _checkIntegrity(settings.eveningSlopeDuration, check="unsigned")
-    _checkIntegrity(settings.deviationDuration, check="unsigned")
-    _checkIntegrity(settings.autoPowerOff, check="boolean")
-    _checkIntegrity(settings.autoPowerOn, check="boolean")
+    name = settings.__name__.split(".")
+    name = name[len(name) - 1]
+    _checkIntegrity(settings.alarmTime, check="time", tag=name)
+    _checkIntegrity(settings.alarmOffset, check="unsigned", tag=name)
+    _checkIntegrity(settings.sleepTime, check="time", tag=name)
+    _checkIntegrity(settings.windDownTime, check="unsigned", tag=name)
+    _checkIntegrity(settings.morningSlopeDuration, check="unsigned", tag=name)
+    _checkIntegrity(settings.eveningSlopeDuration, check="unsigned", tag=name)
+    _checkIntegrity(settings.deviationDuration, check="unsigned", tag=name)
+    _checkIntegrity(settings.autoPowerOff, check="boolean", tag=name)
+    _checkIntegrity(settings.autoPowerOn, check="boolean", tag=name)
