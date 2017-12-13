@@ -64,7 +64,10 @@ def set(id, group, data, keys=None):
                 keys.append(key)
 
         for k in keys:
-            content[group][k] = data[k]
+            if data[k] is not None:
+                content[group][k] = data[k]
+            else:
+                log.error("It happened! %s" % k)
 
         with open(filePath, 'w') as f:
             f.write(json.dumps(content))
@@ -117,7 +120,7 @@ def _cleanup(days=Global.dynamicSettingsKeep):
 
         if remove:
             os.remove(path)
-            log("[Cleanup] Removed dynamic settings file `%s`." % f)
+            log("[Cleanup] Removed old dynamic settings file `%s`." % f)
 
 
 _cleanup()
