@@ -50,6 +50,7 @@ class Cycle:
 
             if self.time.update or self.observer[id].update:
                 newVals = self.lookup.table(self.time.latestCode)
+                newVals = self._applyDynamicSettings(id, newVals)
                 newVals.name = id
 
                 if self.observer[id].update:
@@ -87,30 +88,30 @@ class Cycle:
                     newVals = self.deviation[id].apply(newVals)
                     self.lamp[id] = self._compareWithPrevious(newVals, id)
 
-                self._applyDynamicSettings(id)
                 self.prevLamp[id].copy(newVals)
 
         return self.update
 
-    def _applyDynamicSettings(self, id):
+    def _applyDynamicSettings(self, id, lamp):
         """
         Apply some dynamic settings
         """
         dynamicSettings = settings.dynamic.get(id, ['max', 'min'])
-        if self.lamp[id].brightness is not None:
-            self.lamp[id].brightness = scale(
-                self.lamp[id].brightness,
-                (settings.Global.valRange),
+        if lamp.brightness is not None:
+            lamp.brightness = scale(
+                lamp.brightness,
+                settings.Global.valRange,
                 (dynamicSettings['min']['brightness'],
                  dynamicSettings['max']['brightness'])
             )
-        if self.lamp[id].color is not None:
-            self.lamp[id].color = scale(
-                self.lamp[id].color,
-                (settings.Global.valRange),
+        if lamp.color is not None:
+            lamp.color = scale(
+                lamp.color,
+                settings.Global.valRange,
                 (dynamicSettings['min']['color'],
                  dynamicSettings['max']['color'])
             )
+        return lamp
 
     def _compareWithPrevious(self, new, id):
         """
@@ -219,7 +220,7 @@ class Deviation:
             if self.counter >= self.duration:
                 self.reset()
 
-            multiplier = self.table[self.counter] / 100
+            multiplier = self.table[self.counter] / 1000
 
             self.values['brightness'] = round(self.setValues['brightness']
                                               * multiplier)
