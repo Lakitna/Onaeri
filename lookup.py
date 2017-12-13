@@ -44,14 +44,8 @@ class Lookup:
 
         # Build lookup tables
         self.anatomy = self._buildAnatomy()
-        self.brightness = self._buildTable(
-            data.brightness,
-            self.config.brightnessCorrect
-        )
-        self.color = self._buildTable(
-            data.color,
-            self.config.colorCorrect
-        )
+        self.brightness = self._buildTable(data.brightness)
+        self.color = self._buildTable(data.color)
 
         # print(self.brightness)
         # print()
@@ -65,16 +59,8 @@ class Lookup:
         """
         Get lamp values associated with timecode. Returns lamp object
         """
-        self.lamp.brightness = scale(
-            self.brightness[timeCode],
-            (0, 100),
-            settings.Global.valRange
-        )
-        self.lamp.color = scale(
-            self.color[timeCode],
-            (0, 100),
-            settings.Global.valRange
-        )
+        self.lamp.color = self.color[timeCode]
+        self.lamp.brightness = self.brightness[timeCode]
 
         if timeCode == (self._alarmTime - self._alarmOffset):
             self.lamp.power = True
@@ -119,7 +105,7 @@ class Lookup:
                     anatomy[phase].remove(partial)
         return anatomy
 
-    def _buildTable(self, source, sourceRange):
+    def _buildTable(self, source):
         """
         Build a lookup table based on class attributes and a given data source.
         Returns list
@@ -131,36 +117,21 @@ class Lookup:
                                            self.config.eveningSlopeDuration)
 
         # Create full table and default to nightflat
-        table = ([source['night'] + sourceRange[0]]
-                 * settings.Global.totalDataPoints)
+        table = ([source['night']] * settings.Global.totalDataPoints)
 
         for timeCode in range(self._morningSlope[0], self._morningSlope[1]):
             table[timeCode] = source['morning'][timeCode
                                                 - self._morningSlope[0]]
-            table[timeCode] = scale(table[timeCode],
-                                    (0, 100),
-                                    sourceRange,
-                                    decimals=1)
 
         for timeCode in range(self._eveningSlope[0], self._eveningSlope[1]):
             table[timeCode] = source['evening'][timeCode
                                                 - self._eveningSlope[0]]
-            table[timeCode] = scale(table[timeCode],
-                                    (0, 100),
-                                    sourceRange,
-                                    decimals=1)
 
         for timeCode in range(self._eveningSlope[2], self._eveningSlope[3]):
             table[timeCode] = source['evening'][timeCode
                                                 - self._eveningSlope[2]]
-            table[timeCode] = scale(table[timeCode],
-                                    (0, 100),
-                                    sourceRange,
-                                    decimals=1)
 
         for timeCode in range(self._morningSlope[1], self._eveningSlope[0]):
-            table[timeCode] = scale(source['day'],
-                                    (0, 100),
-                                    sourceRange)
+            table[timeCode] = source['day']
 
         return table
