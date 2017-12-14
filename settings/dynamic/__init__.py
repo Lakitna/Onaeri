@@ -46,12 +46,10 @@ def set(id, group, data, keys=None):
     filePath = "%s/%s.%s" % (folderPath, id, expectedExtention)
     try:
         content = json.load(open(filePath))
-    except FileNotFoundError:
+    except (FileNotFoundError, json.decoder.JSONDecodeError):
         _reset(id)
         set(id, group, data, keys)
-    except json.decoder.JSONDecodeError:
-        _reset(id)
-        set(id, group, data, keys)
+        return
 
     if type(data) is dict:
         if group not in content:
