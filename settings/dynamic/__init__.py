@@ -63,8 +63,6 @@ def set(id, group, data, keys=None):
         for k in keys:
             if data[k] is not None:
                 content[group][k] = data[k]
-            else:
-                log.error("It happened! %s" % k)
 
         with open(filePath, 'w') as f:
             f.write(json.dumps(content))
