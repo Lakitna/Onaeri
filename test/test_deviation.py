@@ -1,4 +1,5 @@
 from .. import cycle
+from .. import settings
 from ..settings import Template as testSettings
 from ..lamp import Lamp
 
@@ -10,6 +11,7 @@ def test_change():
                'day': [(10, 20)],
                'evening': [(20, 30)],
                'night': [(30, 40)]}
+    settings.dynamic._reset("Template One")
     d = cycle.Deviation("Template One", anatomy, testSettings)
     d.change(data, change, 20)
     assert d.active is True
@@ -32,6 +34,7 @@ def test_apply():
                'day': [(10, 20)],
                'evening': [(20, 30)],
                'night': [(30, 40)]}
+    settings.dynamic._reset("Template One")
     d = cycle.Deviation("Template One", anatomy, testSettings)
     d.change(data, change, 20)
 
