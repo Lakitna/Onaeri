@@ -32,9 +32,15 @@ class Cycle:
         self.prevLamp = {}
         for id in self.devices:
             self.observer[id] = Observer(name)
-            self.deviation[id] = Deviation(self.settings)
+            self.deviation[id] = Deviation(id,
+                                           self.lookup.anatomy,
+                                           self.settings)
             self.lamp[id] = Lamp()
             self.prevLamp[id] = Lamp()
+            settings.dynamic.set(id,
+                                 "power",
+                                 {'off': self.lookup.anatomy['night'][0][0],
+                                  'on': self.lookup.anatomy['morning'][0][0]})
 
         log.success("Done")
 
@@ -70,7 +76,8 @@ class Cycle:
                         )
                     elif self.lookup.period == 'evening':
                         self.deviation[id].change(newVals,
-                                                  self.observer[id].data)
+                                                  self.observer[id].data,
+                                                  self.time.latestCode)
 
                 if self.observer[id].turnedOff:
                     self.lamp[id].power = False
@@ -96,7 +103,8 @@ class Cycle:
         """
         Apply some dynamic settings
         """
-        dynamicSettings = settings.dynamic.get(id, ['max', 'min'])
+        dynamicSettings = settings.dynamic.get(id,
+                                               ['max', 'min', 'power'])
         if lamp.brightness is not None:
             lamp.brightness = scale(
                 lamp.brightness,
@@ -104,6 +112,7 @@ class Cycle:
                 (dynamicSettings['min']['brightness'],
                  dynamicSettings['max']['brightness'])
             )
+
         if lamp.color is not None:
             lamp.color = scale(
                 lamp.color,
@@ -111,6 +120,16 @@ class Cycle:
                 (dynamicSettings['min']['color'],
                  dynamicSettings['max']['color'])
             )
+
+        if self.time.latestCode == dynamicSettings['power']['off']:
+            if self.settings.autoPowerOff:
+                lamp.power = False
+        elif self.time.latestCode == dynamicSettings['power']['on']:
+            if self.settings.autoPowerOn:
+                lamp.power = True
+        else:
+            lamp.power = None
+
         return lamp
 
     def _compareWithPrevious(self, new, id):
@@ -126,15 +145,9 @@ class Cycle:
             if not new.power == self.prevLamp[id].power:
                 lamp.power = new.power
 
-            if lamp.power is not None:
-                if not self.settings.autoPowerOff and lamp.power is False:
-                    lamp.power = None
-                if not self.settings.autoPowerOn and lamp.power is True:
-                    lamp.power = None
-
-                if lamp.power is True:
-                    lamp.brightness = new.brightness
-                    lamp.color = new.color
+            if lamp.power is True:
+                lamp.brightness = new.brightness
+                lamp.color = new.color
 
             lamp.mode = new.mode
 
@@ -177,23 +190,27 @@ class Deviation:
     """
     Allow the user to temporary deviate from the given cycle.
     """
-    def __init__(self, userSettings):
-        self.duration = userSettings.deviationDuration
-        self.table = sequenceResize(data.deviation, self.duration)
+    def __init__(self, id, anatomy, settings):
+        self.duration = 0
+        self.table = []
+
+        self._anatomy = anatomy
+        self.id = id
+        self.settings = settings
 
         self.counter = 0
         self.active = False
-        self.values = {'brightness': 0, 'color': 0}
-        self.setValues = {'brightness': 0, 'color': 0}
+        self.values = {}
+        self.setValues = {}
         self.reset()
 
-    def change(self, dataVals, changeVals):
+    def change(self, dataVals, changeVals, timeCode):
         """
         Apply an observed change to deviation routine
         """
         self.reset()
-
-        # log(changeVals)
+        self.duration = self._calculateDuration(timeCode)
+        self.table = sequenceResize(data.deviation, self.duration)
 
         if changeVals.power and self.duration > 0:
             if changeVals.color is None:
@@ -211,6 +228,27 @@ class Deviation:
                or not inRange(self.setValues['color'], (-10, 10)):
                 self.values = self.setValues.copy()
                 self.active = True
+
+    def _calculateDuration(self, timeCode):
+        """
+        Calcuate the duration of the deviationcycle
+        """
+        duration = 0
+        for partial in self._anatomy['evening']:
+            if timeCode in range(partial[0], partial[1]):
+                sleeptime = self._anatomy['night'][0][0]
+                if sleeptime < timeCode:
+                    sleeptime += settings.Global.totalDataPoints
+                duration = sleeptime - timeCode
+                break
+
+        if duration < self.settings.deviationDuration:
+            duration = self.settings.deviationDuration
+            settings.dynamic.set(self.id,
+                                 "power",
+                                 {"off": timeCode + duration})
+
+        return duration
 
     def apply(self, newVals):
         """

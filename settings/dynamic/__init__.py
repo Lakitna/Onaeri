@@ -10,6 +10,7 @@ folderPath = os.path.dirname(os.path.abspath(__file__))
 fileTemplate = {
     'min': {'brightness': Global.valRange[0], 'color': Global.valRange[0]},
     'max': {'brightness': Global.valRange[1], 'color': Global.valRange[1]},
+    'power': {'off': 0, 'on': 0},
     'meta': {'called': 0, 'created': time.time()}
 }
 

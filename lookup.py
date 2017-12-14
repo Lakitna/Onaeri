@@ -70,13 +70,6 @@ class Lookup:
             settings.Global.valRange
         )
 
-        if timeCode == (self._alarmTime - self._alarmOffset):
-            self.lamp.power = True
-        elif timeCode == self._sleepTime:
-            self.lamp.power = False
-        else:
-            self.lamp.power = None
-
         period = self.period
         if period == 'night':
             self.lamp.mode = 'dark'
@@ -86,9 +79,8 @@ class Lookup:
         return self.lamp
 
     @property
-    def period(self, timeCode=None):
-        if timeCode is None:
-            timeCode = self.time.code()
+    def period(self):
+        timeCode = self.time.code()
 
         for period in self.anatomy:
             for sub in self.anatomy[period]:

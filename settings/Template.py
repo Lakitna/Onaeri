@@ -29,4 +29,4 @@ morningSlopeDuration = 60
 eveningSlopeDuration = 500
 
 # Temporary cycle deviation duration in minutes
-deviationDuration = 45
+deviationDuration = 30
