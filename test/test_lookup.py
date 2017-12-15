@@ -1,6 +1,5 @@
 from ..lookup import Lookup
 from ..settings import Template as testSettings
-from .. import settings
 
 """
 It's hard to make automatic testers for Lookup. Visual inspection of the
