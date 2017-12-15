@@ -25,30 +25,17 @@ class Lookup:
         self._windDownTime = self.time.code(m=self.config.windDownTime)
 
         # Create morning and evening slopes based on sleep rhythm settings
-        self._morningSlope = [0, 0, 0, 0]
-        self._morningSlope[0] = (self._alarmTime - self._alarmOffset)
-        self._morningSlope[1] = (self._morningSlope[0]
-                                 + self.config.morningSlopeDuration)
-        self._morningSlope[2] = self._morningSlope[0]
-        self._morningSlope[3] = self._morningSlope[1]
-        if self._morningSlope[1] > settings.Global.totalDataPoints:
-            self._morningSlope[1] = settings.Global.totalDataPoints
-            self._morningSlope[2] = 0
-            self._morningSlope[3] -= settings.Global.totalDataPoints
+        self.morningSlope = timecodeRange(
+            self._alarmTime - self._alarmOffset,
+            (self._alarmTime
+             - self._alarmOffset
+             + self.config.morningSlopeDuration)
+        )
 
-        self._eveningSlope = [0, 0, 0, 0]
-        self._eveningSlope[0] = (self._sleepTime
-                                 - self.config.eveningSlopeDuration)
-        self._eveningSlope[1] = self._sleepTime
-        self._eveningSlope[2] = self._eveningSlope[0]
-        self._eveningSlope[3] = self._eveningSlope[1]
-        if self._eveningSlope[0] < 0:
-            self._eveningSlope[2] = 0
-            self._eveningSlope[3] = self._sleepTime
-
-            self._eveningSlope[0] = (self._eveningSlope[0]
-                                     + settings.Global.totalDataPoints)
-            self._eveningSlope[1] = settings.Global.totalDataPoints
+        self.eveningSlope = timecodeRange(
+            self._sleepTime - self.config.eveningSlopeDuration,
+            self._sleepTime
+        )
 
         # Build lookup tables
         self.anatomy = self._buildAnatomy()
@@ -79,7 +66,6 @@ class Lookup:
         )
 
         period = self.period
-
         darkrange = timecodeRange(self._sleepTime - self._windDownTime,
                                   self._sleepTime)
         if (period == 'night' or inRange(timeCode, darkrange)):
@@ -98,14 +84,12 @@ class Lookup:
 
     def _buildAnatomy(self):
         anatomy = {
-            "morning": timecodeRange(self._morningSlope[0],
-                                     self._morningSlope[3]),
-            "day": timecodeRange(self._morningSlope[3],
-                                 self._eveningSlope[0]),
-            "evening": timecodeRange(self._eveningSlope[0],
-                                     self._eveningSlope[3]),
-            "night": timecodeRange(self._eveningSlope[3],
-                                   self._morningSlope[0])
+            "morning": self.morningSlope,
+            "day": timecodeRange(self.morningSlope[-1][1],
+                                 self.eveningSlope[0][0]),
+            "evening": self.eveningSlope,
+            "night": timecodeRange(self.eveningSlope[-1][1],
+                                   self.morningSlope[0][0])
         }
 
         return anatomy
@@ -122,21 +106,17 @@ class Lookup:
                                            self.config.eveningSlopeDuration)
 
         # Create full table and default to nightflat
-        table = ([source['night']] * settings.Global.totalDataPoints)
+        table = [source['night']] * settings.Global.totalDataPoints
 
-        for timeCode in range(self._morningSlope[0], self._morningSlope[1]):
-            table[timeCode] = source['morning'][timeCode
-                                                - self._morningSlope[0]]
-
-        for timeCode in range(self._eveningSlope[0], self._eveningSlope[1]):
-            table[timeCode] = source['evening'][timeCode
-                                                - self._eveningSlope[0]]
-
-        for timeCode in range(self._eveningSlope[2], self._eveningSlope[3]):
-            table[timeCode] = source['evening'][timeCode
-                                                - self._eveningSlope[2]]
-
-        for timeCode in range(self._morningSlope[1], self._eveningSlope[0]):
-            table[timeCode] = source['day']
+        for period in self.anatomy:
+            c = 0
+            for rnge in self.anatomy[period]:
+                if period == 'day' or period == 'night':
+                    for timeCode in range(rnge[0], rnge[1]):
+                        table[timeCode] = source[period]
+                else:
+                    for timeCode in range(rnge[0], rnge[1]):
+                        table[timeCode] = source[period][c]
+                        c += 1
 
         return table
