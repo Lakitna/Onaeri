@@ -57,7 +57,6 @@ def timecodeRange(min, max):
     """
     Get a timecode range. Supports 0 hour rollover.
     """
-    rnge = [(min, max)]
     if max < 0:
         max += settings.Global.totalDataPoints
     if max > settings.Global.totalDataPoints:
@@ -67,6 +66,8 @@ def timecodeRange(min, max):
         min += settings.Global.totalDataPoints
     if min > settings.Global.totalDataPoints:
         min -= settings.Global.totalDataPoints
+
+    rnge = [(min, max)]
 
     if max < min:
         rnge = [
