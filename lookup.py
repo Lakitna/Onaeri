@@ -1,6 +1,6 @@
 from .timekeeper import TimeKeeper
 from . import data
-from .helper import scale, sequenceResize, inRange
+from .helper import scale, sequenceResize, inRange, timecodeRange
 from .lamp import Lamp
 from .logger import *
 
@@ -29,11 +29,19 @@ class Lookup:
         self._morningSlope[0] = (self._alarmTime - self._alarmOffset)
         self._morningSlope[1] = (self._morningSlope[0]
                                  + self.config.morningSlopeDuration)
+        self._morningSlope[2] = self._morningSlope[0]
+        self._morningSlope[3] = self._morningSlope[1]
+        if self._morningSlope[1] > settings.Global.totalDataPoints:
+            self._morningSlope[1] = settings.Global.totalDataPoints
+            self._morningSlope[2] = 0
+            self._morningSlope[3] -= settings.Global.totalDataPoints
 
         self._eveningSlope = [0, 0, 0, 0]
         self._eveningSlope[0] = (self._sleepTime
                                  - self.config.eveningSlopeDuration)
         self._eveningSlope[1] = self._sleepTime
+        self._eveningSlope[2] = self._eveningSlope[0]
+        self._eveningSlope[3] = self._eveningSlope[1]
         if self._eveningSlope[0] < 0:
             self._eveningSlope[2] = 0
             self._eveningSlope[3] = self._sleepTime
@@ -71,7 +79,10 @@ class Lookup:
         )
 
         period = self.period
-        if period == 'night':
+
+        darkrange = timecodeRange(self._sleepTime - self._windDownTime,
+                                  self._sleepTime)
+        if (period == 'night' or inRange(timeCode, darkrange)):
             self.lamp.mode = 'dark'
         else:
             self.lamp.mode = None
@@ -81,28 +92,22 @@ class Lookup:
     @property
     def period(self):
         timeCode = self.time.code()
-
         for period in self.anatomy:
-            for sub in self.anatomy[period]:
-                if timeCode in range(sub[0], sub[1]):
-                    return period
+            if inRange(timeCode, self.anatomy[period]):
+                return period
 
     def _buildAnatomy(self):
         anatomy = {
-            "morning": [(self._morningSlope[0], self._morningSlope[1]),
-                        (self._morningSlope[2], self._morningSlope[3])],
-            "day": [(self._morningSlope[1], self._eveningSlope[0]),
-                    (0, 0)],
-            "evening": [(self._eveningSlope[0], self._eveningSlope[1]),
-                        (self._eveningSlope[2], self._eveningSlope[3])],
-            "night": [(self._eveningSlope[1], settings.Global.totalDataPoints),
-                      (self._eveningSlope[3], self._morningSlope[0])]
+            "morning": timecodeRange(self._morningSlope[0],
+                                     self._morningSlope[3]),
+            "day": timecodeRange(self._morningSlope[3],
+                                 self._eveningSlope[0]),
+            "evening": timecodeRange(self._eveningSlope[0],
+                                     self._eveningSlope[3]),
+            "night": timecodeRange(self._eveningSlope[3],
+                                   self._morningSlope[0])
         }
 
-        for phase in anatomy:
-            for partial in anatomy[phase]:
-                if partial[0] == partial[1]:
-                    anatomy[phase].remove(partial)
         return anatomy
 
     def _buildTable(self, source):

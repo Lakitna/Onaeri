@@ -1,3 +1,6 @@
+from . import settings
+
+
 def scale(val, inRange, outRange, decimals=0):
     """
     Scale the given value from one scale to another
@@ -50,12 +53,52 @@ def limitTo(val, rnge):
     return val
 
 
+def timecodeRange(min, max):
+    """
+    Get a timecode range. Supports 0 hour rollover.
+    """
+    rnge = [(min, max)]
+    if max < 0:
+        max += settings.Global.totalDataPoints
+    if max > settings.Global.totalDataPoints:
+        max -= settings.Global.totalDataPoints
+
+    if min < 0:
+        min += settings.Global.totalDataPoints
+    if min > settings.Global.totalDataPoints:
+        min -= settings.Global.totalDataPoints
+
+    if max < min:
+        rnge = [
+            (min, settings.Global.totalDataPoints),
+            (0, max)
+        ]
+
+    for phase in rnge:
+        if phase[0] == phase[1]:
+            rnge.remove(phase)
+
+    return rnge
+
+
 def inRange(val, rnge):
     """
     Find out if input value is within a given absolute range
     """
+    def do(value, rnge):
+        if rnge[0] <= value <= rnge[1]:
+            return True
+
     if val is None:
         return False
-    if rnge[0] <= val <= rnge[1]:
-        return True
+
+    for r in rnge:
+        if type(r) is tuple or type(r) is list:
+            if len(r) == 2:
+                if do(val, r):
+                    return True
+        else:
+            if do(val, rnge):
+                return True
+            break
     return False
