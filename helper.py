@@ -1,4 +1,5 @@
 from . import settings
+import math
 
 
 def scale(val, inRange, outRange, decimals=0):
@@ -26,17 +27,20 @@ def scale(val, inRange, outRange, decimals=0):
 
 def sequenceResize(source, length):
     """
-    Crude way of resizing a data sequence.
-    Shrinking is here more accurate than expanding.
+    Resize a data sequence.
     """
-    sourceLen = len(source)
     out = []
+    step = float(len(source) - 1) / (length - 1)
     for i in range(length):
-        key = int(i * (sourceLen / length))
-        if key >= sourceLen:
-            key = sourceLen - 1
+        key = i * step
+        if key > len(source) - 1:
+            key = len(source) - 1
 
-        out.append(source[key])
+        low = source[int(math.floor(key))]
+        high = source[int(math.ceil(key))]
+        ratio = key % 1
+        out.append(round((1 - ratio) * low + ratio * high))
+
     return out
 
 
