@@ -92,6 +92,13 @@ class Lookup:
                                    self.morningSlope[0][0])
         }
 
+        if (inRange(anatomy['morning'][-1][1], anatomy['evening'])
+           or inRange(anatomy['morning'][0][0], anatomy['evening'])):
+            log.error("Morning and evening cycles overlap.")
+            log.warn("The program will try to run like normal, but some " +
+                     "weird behaviour is inevitable.")
+            log.warn("Change your settings to fix this.")
+
         return anatomy
 
     def _buildTable(self, source):
