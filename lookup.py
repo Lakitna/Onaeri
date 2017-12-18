@@ -2,7 +2,7 @@ from .timekeeper import TimeKeeper
 from . import data
 from .helper import scale, sequenceResize, inRange, timecodeRange
 from .lamp import Lamp
-from .logger import *
+from .logger import log
 
 from . import settings
 import time
