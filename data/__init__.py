@@ -11,30 +11,30 @@ expectedExtention = "json"
 # Deviation:          y = -0.0001x^3+100 for 0 <= x <= 99
 
 
-path = os.path.dirname(os.path.abspath(__file__))
-files = [f for f in os.listdir(path)
-         if os.path.isfile(os.path.join(path, f))]
+folderPath = os.path.dirname(os.path.abspath(__file__))
+files = [f for f in os.listdir(folderPath)
+         if os.path.isfile(os.path.join(folderPath, f))
+         and not f.startswith(".") and f not in blacklist]
 
 for f in files:
-    if f not in blacklist:
-        name = f.split(".")[0]
-        extention = f.split(".")[1]
-        if extention == expectedExtention:
-            try:
-                requiredData.remove(name)
-            except ValueError:
-                log.warn("[Data] Unexpected file " +
-                         "`%s.%s` found." % (name, extention))
-                log.warn("[Data] Filetype is compatable. Loading file anyway.")
-
-            filePath = "%s/%s" % (path, f)
-            setattr(sys.modules[__name__],
-                    name,
-                    json.load(open(filePath)))
-        else:
+    name = f.split(".")[0]
+    extention = f.split(".")[1]
+    if extention == expectedExtention:
+        try:
+            requiredData.remove(name)
+        except ValueError:
             log.warn("[Data] Unexpected file " +
                      "`%s.%s` found." % (name, extention))
-            log.warn("[Data] Skipping file and moving on.")
+            log.warn("[Data] Filetype is compatable. Loading file anyway.")
+
+        filePath = "%s/%s" % (folderPath, f)
+        setattr(sys.modules[__name__],
+                name,
+                json.load(open(filePath)))
+    else:
+        log.warn("[Data] Unexpected file " +
+                 "`%s.%s` found." % (name, extention))
+        log.warn("[Data] Skipping file and moving on.")
 
 
 if len(requiredData) > 0:
