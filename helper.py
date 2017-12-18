@@ -61,15 +61,8 @@ def timecodeRange(min, max):
     """
     Get a timecode range. Supports 0 hour rollover.
     """
-    if max < 0:
-        max += settings.Global.totalDataPoints
-    if max > settings.Global.totalDataPoints:
-        max -= settings.Global.totalDataPoints
-
-    if min < 0:
-        min += settings.Global.totalDataPoints
-    if min > settings.Global.totalDataPoints:
-        min -= settings.Global.totalDataPoints
+    max = timecodeWrap(max)
+    min = timecodeWrap(min)
 
     rnge = [(min, max)]
 
@@ -107,3 +100,15 @@ def inRange(val, rnge):
                 return True
             break
     return False
+
+
+def timecodeWrap(val):
+    """
+    Wrap the input so that it's always within timecode range.
+    Not foolproof, but good enough.
+    """
+    if val < 0:
+        val += settings.Global.totalDataPoints
+    elif val > settings.Global.totalDataPoints:
+        val -= settings.Global.totalDataPoints
+    return val

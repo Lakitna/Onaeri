@@ -1,6 +1,6 @@
 import time
 from .lookup import Lookup
-from .helper import sequenceResize, inRange, limitTo, scale
+from .helper import sequenceResize, inRange, limitTo, scale, timecodeWrap
 from . import data
 from .observer import Observer
 from .lamp import Lamp
@@ -60,24 +60,26 @@ class Cycle:
                 newVals.name = id
 
                 if self.observer[id].update:
-                    if self.lookup.period == 'day':
-                        settings.dynamic.set(
-                            id,
-                            'max',
-                            self.observer[id].data(),
-                            keys=['brightness', 'color']
-                        )
-                    elif self.lookup.period == 'night':
-                        settings.dynamic.set(
-                            id,
-                            'min',
-                            self.observer[id].data(),
-                            keys=['brightness', 'color']
-                        )
-                    elif self.lookup.period == 'evening':
+                    if self.lookup.period == 'evening':
                         self.deviation[id].change(newVals,
                                                   self.observer[id].data,
                                                   self.time.latestCode)
+                    elif (not self.observer[id].turnedOn
+                          and not self.observer[id].turnedOff):
+                        if self.lookup.period == 'day':
+                            settings.dynamic.set(
+                                id,
+                                'max',
+                                self.observer[id].data(),
+                                keys=['brightness', 'color']
+                            )
+                        elif self.lookup.period == 'night':
+                            settings.dynamic.set(
+                                id,
+                                'min',
+                                self.observer[id].data(),
+                                keys=['brightness', 'color']
+                            )
 
                 if self.observer[id].turnedOff:
                     self.lamp[id].power = False
@@ -234,19 +236,17 @@ class Deviation:
         Calcuate the duration of the deviationcycle
         """
         duration = 0
-        for partial in self._anatomy['evening']:
-            if timeCode in range(partial[0], partial[1]):
-                sleeptime = self._anatomy['night'][0][0]
-                if sleeptime < timeCode:
-                    sleeptime += settings.Global.totalDataPoints
-                duration = sleeptime - timeCode
-                break
+        if inRange(timecode, self._anatomy['evening']):
+            sleeptime = self._anatomy['night'][0][0]
+            if sleeptime < timeCode:
+                sleeptime += settings.Global.totalDataPoints
+            duration = sleeptime - timeCode
 
         if duration < self.settings.deviationDuration:
             duration = self.settings.deviationDuration
             settings.dynamic.set(self.id,
                                  "power",
-                                 {"off": timeCode + duration})
+                                 {"off": timecodeWrap(timeCode + duration)})
 
         return duration
 
