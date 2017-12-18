@@ -29,6 +29,9 @@ def sequenceResize(source, length):
     """
     Resize a data sequence.
     """
+    if length <= 1:
+        return [source[0]]
+
     out = []
     step = float(len(source) - 1) / (length - 1)
     for i in range(length):

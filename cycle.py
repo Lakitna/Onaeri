@@ -236,7 +236,7 @@ class Deviation:
         Calcuate the duration of the deviationcycle
         """
         duration = 0
-        if inRange(timecode, self._anatomy['evening']):
+        if inRange(timeCode, self._anatomy['evening']):
             sleeptime = self._anatomy['night'][0][0]
             if sleeptime < timeCode:
                 sleeptime += settings.Global.totalDataPoints
