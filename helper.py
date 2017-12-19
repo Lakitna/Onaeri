@@ -4,7 +4,7 @@ import math
 
 def scale(val, inRange, outRange, decimals=0):
     """
-    Scale the given value from one scale to another
+    Scale the given value from one range to another
     """
     if val is None:
         return None
@@ -35,10 +35,7 @@ def sequenceResize(source, length):
     out = []
     step = float(len(source) - 1) / (length - 1)
     for i in range(length):
-        key = i * step
-        if key > len(source) - 1:
-            key = len(source) - 1
-
+        key = round(i * step, 5)
         low = source[int(math.floor(key))]
         high = source[int(math.ceil(key))]
         ratio = key % 1
@@ -108,7 +105,6 @@ def inRange(val, rnge):
 def timecodeWrap(val):
     """
     Wrap the input so that it's always within timecode range.
-    Not foolproof, but good enough.
     """
     if val < 0:
         val += settings.Global.totalDataPoints

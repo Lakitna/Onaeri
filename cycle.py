@@ -59,27 +59,27 @@ class Cycle:
                 newVals = self._applyDynamicSettings(id, newVals)
                 newVals.name = id
 
-                if self.observer[id].update:
+                if (self.observer[id].update
+                   and not self.observer[id].turnedOn
+                   and not self.observer[id].turnedOff):
                     if self.lookup.period == 'evening':
                         self.deviation[id].change(newVals,
                                                   self.observer[id].data,
                                                   self.time.latestCode)
-                    elif (not self.observer[id].turnedOn
-                          and not self.observer[id].turnedOff):
-                        if self.lookup.period == 'day':
-                            settings.dynamic.set(
-                                id,
-                                'max',
-                                self.observer[id].data(),
-                                keys=['brightness', 'color']
-                            )
-                        elif self.lookup.period == 'night':
-                            settings.dynamic.set(
-                                id,
-                                'min',
-                                self.observer[id].data(),
-                                keys=['brightness', 'color']
-                            )
+                    elif self.lookup.period == 'day':
+                        settings.dynamic.set(
+                            id,
+                            'max',
+                            self.observer[id].data(),
+                            keys=['brightness', 'color']
+                        )
+                    elif self.lookup.period == 'night':
+                        settings.dynamic.set(
+                            id,
+                            'min',
+                            self.observer[id].data(),
+                            keys=['brightness', 'color']
+                        )
 
                 if self.observer[id].turnedOff:
                     self.lamp[id].power = False
@@ -123,14 +123,13 @@ class Cycle:
                  dynamicSettings['max']['color'])
             )
 
+        lamp.power = None
         if self.time.latestCode == dynamicSettings['power']['off']:
             if self.settings.autoPowerOff:
                 lamp.power = False
         elif self.time.latestCode == dynamicSettings['power']['on']:
             if self.settings.autoPowerOn:
                 lamp.power = True
-        else:
-            lamp.power = None
 
         return lamp
 
@@ -138,8 +137,30 @@ class Cycle:
         """
         Update lamp values (brightness & color)
         """
+        def update():
+            """
+            Should the lamps be updated?
+            Previously an if-statement that grew too complex.
+            """
+            # If the lamp should be turned on
+            if new.power:
+                return True
+
+            # If the lamp is currently on
+            if self.observer[id].data.power:
+                # If mode changes
+                if not new.mode == self.prevLamp[id].mode:
+                    return True
+                # If the new values are not the same as the old ones
+                if not new == self.prevLamp[id]:
+                    return True
+                # If observer calls for an update
+                if self.observer[id].update:
+                    return True
+            return False
+
         lamp = Lamp()
-        if self._lampUpdate(new, id):
+        if update():
             if not new.brightness == self.prevLamp[id].brightness:
                 lamp.brightness = new.brightness
             if not new.color == self.prevLamp[id].color:
@@ -163,29 +184,6 @@ class Cycle:
             self.observer[id].legalChange
 
         return lamp
-
-    def _lampUpdate(self, new, id):
-        """
-        Define if the lamps should be updated.
-        Previously a very complex if statement.
-        """
-        # If the lamp should be turned on according to Lookup
-        if new.power:
-            return True
-
-        # If the lamp is currently on
-        if self.observer[id].data.power:
-            # If mode changes
-            if not new.mode == self.prevLamp[id].mode:
-                return True
-            # If the new values are not the same as the old ones
-            if not new == self.prevLamp[id]:
-                return True
-            # If observer calls for an update
-            if self.observer[id].update:
-                return True
-
-        return False
 
 
 class Deviation:
