@@ -56,7 +56,6 @@ class Cycle:
 
             if self.time.update or self.observer[id].update:
                 newVals = self.lookup.table(self.time.latestCode)
-                newVals = self._applyDynamicSettings(id, newVals)
                 newVals.name = id
 
                 if (self.observer[id].update
@@ -80,6 +79,8 @@ class Cycle:
                             self.observer[id].data(),
                             keys=['brightness', 'color']
                         )
+
+                newVals = self._applyDynamicSettings(id, newVals)
 
                 if self.observer[id].turnedOff:
                     self.lamp[id].power = False
