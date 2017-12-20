@@ -1,5 +1,6 @@
 from .settings import dynamic
 from .logger import log
+from .helper import timecodeWrap
 
 
 class Scheduler:
@@ -15,6 +16,7 @@ class Scheduler:
         Add an event to the schedule
         """
         def keyExists(key):
+            key = timecodeWrap(key)
             if key in self.events:
                 return keyExists(key + 1)
             return key
@@ -24,8 +26,7 @@ class Scheduler:
                 time = (time, 0)
             time = self.time.code(h=time[0], m=time[1], dry=True)
 
-        self.events[keyExists(time)] = (
-            function, description, args)
+        self.events[keyExists(time)] = (function, description, args)
 
     def tick(self):
         """
