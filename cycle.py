@@ -106,23 +106,26 @@ class Cycle:
         """
         Apply some dynamic settings
         """
-        dynamicSettings = settings.dynamic.get(id,
-                                               ['max', 'min', 'power'])
-        if lamp.brightness is not None:
+        dynamicSettings = settings.dynamic.get(id)
+        if lamp.brightness is not None and dynamicSettings['features']['dim']:
             lamp.brightness = scale(
                 lamp.brightness,
                 settings.Global.valRange,
                 (dynamicSettings['min']['brightness'],
                  dynamicSettings['max']['brightness'])
             )
+        else:
+            lamp.brightness = None
 
-        if lamp.color is not None:
+        if lamp.color is not None and dynamicSettings['features']['temp']:
             lamp.color = scale(
                 lamp.color,
                 settings.Global.valRange,
                 (dynamicSettings['min']['color'],
                  dynamicSettings['max']['color'])
             )
+        else:
+            lamp.color = None
 
         lamp.power = None
         if self.time.latestCode == dynamicSettings['power']['off']:
