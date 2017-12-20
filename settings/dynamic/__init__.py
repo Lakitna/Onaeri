@@ -4,6 +4,7 @@ import time
 from ...logger import log
 from .. import Global
 
+enableLogs = True
 
 blacklist = ['__init__.py']
 expectedExtention = "json"
