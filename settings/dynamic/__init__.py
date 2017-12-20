@@ -4,6 +4,7 @@ import time
 from ...logger import log
 from .. import Global
 
+
 blacklist = ['__init__.py']
 expectedExtention = "json"
 folderPath = os.path.dirname(os.path.abspath(__file__))
@@ -55,9 +56,7 @@ def set(id, group, data, keys=None):
         if group not in content:
             content[group] = {}
         if keys is None:
-            keys = []
-            for key in data:
-                keys.append(key)
+            keys = [key for key in data]
 
         for k in keys:
             if data[k] is not None:
@@ -65,6 +64,12 @@ def set(id, group, data, keys=None):
 
         with open(filePath, 'w') as f:
             f.write(json.dumps(content))
+
+        if enableLogs:
+            log.blind("[time]\t%s\t%s\t%s" % (str(content['min']),
+                                              str(content['max']),
+                                              str(content['power'])),
+                      name="dynamic_%s" % id)
     else:
         log.error("[Settings][Dynamic] Unexpected datatype provided")
         log("Data provided:")
