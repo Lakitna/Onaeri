@@ -7,14 +7,15 @@ class Lamp:
     """
     Data structure for a lamp
     """
-    def __init__(self, brightness=None,
-                 color=None, power=None,
-                 name=None, mode=None):
+    def __init__(self, brightness=None, color=None,
+                 power=None, name=None, mode=None,
+                 features=None):
         self._brightness = brightness
         self._color = color
         self._power = power
         self._name = name
         self._mode = mode
+        self._features = features
 
     def __call__(self):
         """
@@ -131,3 +132,11 @@ class Lamp:
     @name.setter
     def name(self, value):
         self._name = value
+
+    @property
+    def features(self):
+        return self._features
+
+    @features.setter
+    def features(self, value):
+        self._features = value
