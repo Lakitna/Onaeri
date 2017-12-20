@@ -1,6 +1,7 @@
 import os
 import importlib
 from . import Global
+from . import dynamic
 from .. import data
 from ..logger import log
 
@@ -8,61 +9,78 @@ from ..logger import log
 blacklist = ["Global", "Template", "__init__"]
 
 
-def _checkIntegrity(val, rmin=0, rmax=1, *, check=None):
+def _checkIntegrity(val, rnge=(0, 1), *, check=None, tag=None):
     """
     Check value range and exit() on problems.
     """
+    prefix = ""
+    if tag is not None:
+        prefix = "[%s] " % tag
+
     def _ruling(v, rnge):
         if not rnge[0] <= v <= rnge[1]:
-            log.error(
-                "Invalid setting. '%s' is not in allowed range (%s - %s)."
-                % (val, rnge[0], rnge[1])
-            )
+            log.error("%sInvalid setting. " +
+                      "'%s' is not in allowed range (%s - %s)."
+                      % (prefix, v, rnge[0], rnge[1]))
             exit()
 
-    if check is None:
-        if type(val) is list or type(val) is tuple:
-            for v in val:
-                _ruling(v, (rmin, rmax))
-        else:
-            _ruling(val, (rmin, rmax))
-    elif check is "unsigned":
-        if not val >= 0:
-            log.error("Invalid setting. '%s' is not in allowed range (%s - ∞)."
-                      % (val, rmin))
-            exit()
-    elif check is "string":
-        if not type(val) is str:
-            log.error("Invalid setting. '%s' is not a string." % (val))
-            exit()
-    elif check is "boolean":
-        if not type(val) is bool:
-            log.error("Invalid setting. '%s' is not boolean." % (val))
-            exit()
-    elif check is "time":
-        _ruling(val[0], (0, 23))
-        _ruling(val[1], (0, 59))
-    else:
-        log.error("Check `%s` could not be performed." % check)
-        exit()
+    if type(val) is not list and type(val) is not tuple:
+        if check is "string":
+            if not type(val) is str:
+                log.error("%sInvalid setting. '%s' is not a string."
+                          % (prefix, val))
+                exit()
+        elif check is "boolean":
+            if not type(val) is bool:
+                log.error("%sInvalid setting. '%s' is not boolean."
+                          % (prefix, val))
+                exit()
+        elif check is "time":
+            _ruling(val[0], (0, 23))
+            _ruling(val[1], (0, 59))
+
+        val = [val]
+
+    for v in val:
+        if check is None:
+            _ruling(v, rnge)
+        elif check is "unsigned":
+            if not v >= 0:
+                log.error("%sInvalid setting. " +
+                          "'%s' is not in allowed range (0 - ∞)."
+                          % (prefix, v))
+                exit()
 
 
-_checkIntegrity(Global.minPerTimeCode, check="unsigned")
-_checkIntegrity(Global.transitionTime, check="unsigned")
-_checkIntegrity(Global.totalDataPoints, check="unsigned")
-_checkIntegrity(Global.commandsTries, check="unsigned")
-_checkIntegrity(Global.mainLoopDelay, check="unsigned")
-_checkIntegrity(Global.settingFileExtention, check="string")
+_checkIntegrity(Global.minPerTimeCode, check="unsigned", tag="Global")
+_checkIntegrity(Global.transitionTime, check="unsigned", tag="Global")
+_checkIntegrity(Global.totalDataPoints, check="unsigned", tag="Global")
+_checkIntegrity(Global.commandsTries, check="unsigned", tag="Global")
+_checkIntegrity(Global.mainLoopDelay, check="unsigned", tag="Global")
+_checkIntegrity(Global.settingFileExtention, check="string", tag="Global")
+_checkIntegrity(Global.valRange, check="unsigned", tag="Global")
+_checkIntegrity(Global.dataRange, check="unsigned", tag="Global")
 
-_checkIntegrity(data.brightness['day'], 0, 100)
-_checkIntegrity(data.brightness['night'], 0, 100)
-_checkIntegrity(data.brightness['morning'], 0, 100)
-_checkIntegrity(data.brightness['evening'], 0, 100)
-_checkIntegrity(data.color['day'], 0, 100)
-_checkIntegrity(data.color['night'], 0, 100)
-_checkIntegrity(data.color['morning'], 0, 100)
-_checkIntegrity(data.color['evening'], 0, 100)
-_checkIntegrity(data.deviation, 0, 100)
+_checkIntegrity(data.brightness['day'], Global.dataRange, tag="Data")
+_checkIntegrity(data.brightness['night'], Global.dataRange, tag="Data")
+_checkIntegrity(data.brightness['morning'], Global.dataRange, tag="Data")
+_checkIntegrity(data.brightness['evening'], Global.dataRange, tag="Data")
+_checkIntegrity(data.color['day'], Global.dataRange, tag="Data")
+_checkIntegrity(data.color['night'], Global.dataRange, tag="Data")
+_checkIntegrity(data.color['morning'], Global.dataRange, tag="Data")
+_checkIntegrity(data.color['evening'], Global.dataRange, tag="Data")
+_checkIntegrity(data.deviation, Global.dataRange, tag="Data")
+
+for id in dynamic.list():
+    settings = dynamic.get(id)
+    _checkIntegrity(settings['min']['brightness'], Global.valRange,
+                    tag="Dynamic|%s" % id)
+    _checkIntegrity(settings['min']['color'], Global.valRange,
+                    tag="Dynamic|%s" % id)
+    _checkIntegrity(settings['max']['brightness'], Global.valRange,
+                    tag="Dynamic|%s" % id)
+    _checkIntegrity(settings['max']['color'], Global.valRange,
+                    tag="Dynamic|%s" % id)
 
 
 def _settingFileList():
@@ -117,14 +135,14 @@ def userSettingsValidation(settings):
     """
     Check integrity of settings
     """
-    _checkIntegrity(settings.alarmTime, check="time")
-    _checkIntegrity(settings.alarmOffset, check="unsigned")
-    _checkIntegrity(settings.sleepTime, check="time")
-    _checkIntegrity(settings.windDownTime, check="unsigned")
-    _checkIntegrity(settings.brightnessCorrect, 0, 100)
-    _checkIntegrity(settings.colorCorrect, 0, 100)
-    _checkIntegrity(settings.morningSlopeDuration, check="unsigned")
-    _checkIntegrity(settings.eveningSlopeDuration, check="unsigned")
-    _checkIntegrity(settings.deviationDuration, check="unsigned")
-    _checkIntegrity(settings.autoPowerOff, check="boolean")
-    _checkIntegrity(settings.autoPowerOn, check="boolean")
+    name = settings.__name__.split(".")
+    name = name[len(name) - 1]
+    _checkIntegrity(settings.alarmTime, check="time", tag=name)
+    _checkIntegrity(settings.alarmOffset, check="unsigned", tag=name)
+    _checkIntegrity(settings.sleepTime, check="time", tag=name)
+    _checkIntegrity(settings.windDownTime, check="unsigned", tag=name)
+    _checkIntegrity(settings.morningSlopeDuration, check="unsigned", tag=name)
+    _checkIntegrity(settings.eveningSlopeDuration, check="unsigned", tag=name)
+    _checkIntegrity(settings.deviationDuration, check="unsigned", tag=name)
+    _checkIntegrity(settings.autoPowerOff, check="boolean", tag=name)
+    _checkIntegrity(settings.autoPowerOn, check="boolean", tag=name)

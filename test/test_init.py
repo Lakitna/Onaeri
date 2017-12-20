@@ -11,6 +11,11 @@ def test_init():
         Lamp(30, 50, True, name="Template Four"),
     ]
     settings.cycles = ["Template"]
+    settings.dynamic._reset("Template One")
+    settings.dynamic._reset("Template Two")
+    settings.dynamic._reset("Template Three")
+    settings.dynamic._reset("Template Four")
+
     o = Onaeri(devices)
     assert len(o.cycles) == len(settings.cycles)
     assert len(o.devices) == len(devices)
@@ -24,6 +29,11 @@ def test_tick(capsys):
         Lamp(30, 50, True, name="Template Four"),
     ]
     settings.cycles = ["Template"]
+    settings.dynamic._reset("Template One")
+    settings.dynamic._reset("Template Two")
+    settings.dynamic._reset("Template Three")
+    settings.dynamic._reset("Template Four")
+
     o = Onaeri(devices)
 
     o.tick(devices)

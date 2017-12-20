@@ -1,6 +1,6 @@
 import time
 from .lookup import Lookup
-from .helper import sequenceResize, inRange, limitTo
+from .helper import sequenceResize, inRange, limitTo, scale, timecodeWrap
 from . import data
 from .observer import Observer
 from .lamp import Lamp
@@ -32,9 +32,15 @@ class Cycle:
         self.prevLamp = {}
         for id in self.devices:
             self.observer[id] = Observer(name)
-            self.deviation[id] = Deviation(self.settings)
+            self.deviation[id] = Deviation(id,
+                                           self.lookup.anatomy,
+                                           self.settings)
             self.lamp[id] = Lamp()
             self.prevLamp[id] = Lamp()
+            settings.dynamic.set(id,
+                                 "power",
+                                 {'off': self.lookup.anatomy['night'][0][0],
+                                  'on': self.lookup.anatomy['morning'][0][0]})
 
         log.success("Done")
 
@@ -52,8 +58,29 @@ class Cycle:
                 newVals = self.lookup.table(self.time.latestCode)
                 newVals.name = id
 
-                if self.observer[id].update:
-                    self.deviation[id].change(newVals, self.observer[id].data)
+                if (self.observer[id].update
+                   and not self.observer[id].turnedOn
+                   and not self.observer[id].turnedOff):
+                    if self.lookup.period == 'evening':
+                        self.deviation[id].change(newVals,
+                                                  self.observer[id].data,
+                                                  self.time.latestCode)
+                    elif self.lookup.period == 'day':
+                        settings.dynamic.set(
+                            id,
+                            'max',
+                            self.observer[id].data(),
+                            keys=['brightness', 'color']
+                        )
+                    elif self.lookup.period == 'night':
+                        settings.dynamic.set(
+                            id,
+                            'min',
+                            self.observer[id].data(),
+                            keys=['brightness', 'color']
+                        )
+
+                newVals = self._applyDynamicSettings(id, newVals)
 
                 if self.observer[id].turnedOff:
                     self.lamp[id].power = False
@@ -75,12 +102,66 @@ class Cycle:
 
         return self.update
 
+    def _applyDynamicSettings(self, id, lamp):
+        """
+        Apply some dynamic settings
+        """
+        dynamicSettings = settings.dynamic.get(id,
+                                               ['max', 'min', 'power'])
+        if lamp.brightness is not None:
+            lamp.brightness = scale(
+                lamp.brightness,
+                settings.Global.valRange,
+                (dynamicSettings['min']['brightness'],
+                 dynamicSettings['max']['brightness'])
+            )
+
+        if lamp.color is not None:
+            lamp.color = scale(
+                lamp.color,
+                settings.Global.valRange,
+                (dynamicSettings['min']['color'],
+                 dynamicSettings['max']['color'])
+            )
+
+        lamp.power = None
+        if self.time.latestCode == dynamicSettings['power']['off']:
+            if self.settings.autoPowerOff:
+                lamp.power = False
+        elif self.time.latestCode == dynamicSettings['power']['on']:
+            if self.settings.autoPowerOn:
+                lamp.power = True
+
+        return lamp
+
     def _compareWithPrevious(self, new, id):
         """
         Update lamp values (brightness & color)
         """
+        def update():
+            """
+            Should the lamps be updated?
+            Previously an if-statement that grew too complex.
+            """
+            # If the lamp should be turned on
+            if new.power:
+                return True
+
+            # If the lamp is currently on
+            if self.observer[id].data.power:
+                # If mode changes
+                if not new.mode == self.prevLamp[id].mode:
+                    return True
+                # If the new values are not the same as the old ones
+                if not new == self.prevLamp[id]:
+                    return True
+                # If observer calls for an update
+                if self.observer[id].update:
+                    return True
+            return False
+
         lamp = Lamp()
-        if self._lampUpdate(new, id):
+        if update():
             if not new.brightness == self.prevLamp[id].brightness:
                 lamp.brightness = new.brightness
             if not new.color == self.prevLamp[id].color:
@@ -88,15 +169,9 @@ class Cycle:
             if not new.power == self.prevLamp[id].power:
                 lamp.power = new.power
 
-            if lamp.power is not None:
-                if not self.settings.autoPowerOff and lamp.power is False:
-                    lamp.power = None
-                if not self.settings.autoPowerOn and lamp.power is True:
-                    lamp.power = None
-
-                if lamp.power is True:
-                    lamp.brightness = new.brightness
-                    lamp.color = new.color
+            if lamp.power is True:
+                lamp.brightness = new.brightness
+                lamp.color = new.color
 
             lamp.mode = new.mode
 
@@ -111,51 +186,32 @@ class Cycle:
 
         return lamp
 
-    def _lampUpdate(self, new, id):
-        """
-        Define if the lamps should be updated.
-        Previously a very complex if statement.
-        """
-        # If the lamp should be turned on according to Lookup
-        if new.power:
-            return True
-
-        # If the lamp is currently on
-        if self.observer[id].data.power:
-            # If mode changes
-            if not new.mode == self.prevLamp[id].mode:
-                return True
-            # If the new values are not the same as the old ones
-            if not new == self.prevLamp[id]:
-                return True
-            # If observer calls for an update
-            if self.observer[id].update:
-                return True
-
-        return False
-
 
 class Deviation:
     """
     Allow the user to temporary deviate from the given cycle.
     """
-    def __init__(self, userSettings):
-        self.duration = userSettings.deviationDuration
-        self.table = sequenceResize(data.deviation, self.duration)
+    def __init__(self, id, anatomy, settings):
+        self.duration = 0
+        self.table = []
+
+        self._anatomy = anatomy
+        self.id = id
+        self.settings = settings
 
         self.counter = 0
         self.active = False
-        self.values = {'brightness': 0, 'color': 0}
-        self.setValues = {'brightness': 0, 'color': 0}
+        self.values = {}
+        self.setValues = {}
         self.reset()
 
-    def change(self, dataVals, changeVals):
+    def change(self, dataVals, changeVals, timeCode):
         """
         Apply an observed change to deviation routine
         """
         self.reset()
-
-        # log(changeVals)
+        self.duration = self._calculateDuration(timeCode)
+        self.table = sequenceResize(data.deviation, self.duration)
 
         if changeVals.power and self.duration > 0:
             if changeVals.color is None:
@@ -174,6 +230,25 @@ class Deviation:
                 self.values = self.setValues.copy()
                 self.active = True
 
+    def _calculateDuration(self, timeCode):
+        """
+        Calcuate the duration of the deviationcycle
+        """
+        duration = 0
+        if inRange(timeCode, self._anatomy['evening']):
+            sleeptime = self._anatomy['night'][0][0]
+            if sleeptime < timeCode:
+                sleeptime += settings.Global.totalDataPoints
+            duration = sleeptime - timeCode
+
+        if duration < self.settings.deviationDuration:
+            duration = self.settings.deviationDuration
+            settings.dynamic.set(self.id,
+                                 "power",
+                                 {"off": timecodeWrap(timeCode + duration)})
+
+        return duration
+
     def apply(self, newVals):
         """
         Progress by one tick
@@ -182,7 +257,7 @@ class Deviation:
             if self.counter >= self.duration:
                 self.reset()
 
-            multiplier = self.table[self.counter] / 100
+            multiplier = self.table[self.counter] / 1000
 
             self.values['brightness'] = round(self.setValues['brightness']
                                               * multiplier)

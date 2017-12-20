@@ -1,6 +1,10 @@
+from . import settings
+import math
+
+
 def scale(val, inRange, outRange, decimals=0):
     """
-    Scale the given value from one scale to another
+    Scale the given value from one range to another
     """
     if val is None:
         return None
@@ -23,17 +27,20 @@ def scale(val, inRange, outRange, decimals=0):
 
 def sequenceResize(source, length):
     """
-    Crude way of resizing a data sequence.
-    Shrinking is here more accurate than expanding.
+    Resize a data sequence.
     """
-    sourceLen = len(source)
-    out = []
-    for i in range(length):
-        key = int(i * (sourceLen / length))
-        if key >= sourceLen:
-            key = sourceLen - 1
+    if length <= 1:
+        return [source[0]]
 
-        out.append(source[key])
+    out = []
+    step = float(len(source) - 1) / (length - 1)
+    for i in range(length):
+        key = round(i * step, 5)
+        low = source[int(math.floor(key))]
+        high = source[int(math.ceil(key))]
+        ratio = key % 1
+        out.append(round((1 - ratio) * low + ratio * high))
+
     return out
 
 
@@ -50,12 +57,57 @@ def limitTo(val, rnge):
     return val
 
 
+def timecodeRange(min, max):
+    """
+    Get a timecode range. Supports 0 hour rollover.
+    """
+    max = timecodeWrap(max)
+    min = timecodeWrap(min)
+
+    rnge = [(min, max)]
+
+    if max < min:
+        rnge = [
+            (min, settings.Global.totalDataPoints),
+            (0, max)
+        ]
+
+    for phase in rnge:
+        if phase[0] == phase[1]:
+            rnge.remove(phase)
+
+    return rnge
+
+
 def inRange(val, rnge):
     """
     Find out if input value is within a given absolute range
     """
+    def do(value, rnge):
+        if rnge[0] <= value <= rnge[1]:
+            return True
+
     if val is None:
         return False
-    if rnge[0] <= val <= rnge[1]:
-        return True
+
+    for r in rnge:
+        if type(r) is tuple or type(r) is list:
+            if len(r) == 2:
+                if do(val, r):
+                    return True
+        else:
+            if do(val, rnge):
+                return True
+            break
     return False
+
+
+def timecodeWrap(val):
+    """
+    Wrap the input so that it's always within timecode range.
+    """
+    if val < 0:
+        val += settings.Global.totalDataPoints
+    elif val > settings.Global.totalDataPoints:
+        val -= settings.Global.totalDataPoints
+    return val

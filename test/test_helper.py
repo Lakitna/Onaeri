@@ -1,4 +1,5 @@
 from .. import helper
+from .. import settings
 
 
 def test_scale():
@@ -17,7 +18,7 @@ def test_sequenceResize():
         0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9
     ]
     assert helper.sequenceResize(data, 15) == [
-        0, 0, 1, 2, 2, 3, 4, 4, 5, 6, 6, 7, 8, 8, 9
+        0, 1, 1, 2, 3, 3, 4, 4, 5, 6, 6, 7, 8, 8, 9
     ]
 
 
@@ -33,3 +34,39 @@ def test_inRange():
     assert helper.inRange(0, (0, 100)) is True
     assert helper.inRange(101, (0, 100)) is False
     assert helper.inRange(-3, (0, 100)) is False
+
+    rnge = [(0, 9), (11, 20)]
+    assert helper.inRange(5, rnge) is True
+    assert helper.inRange(15, rnge) is True
+    assert helper.inRange(10, rnge) is False
+    assert helper.inRange(20, rnge) is True
+    assert helper.inRange(9, rnge) is True
+    assert helper.inRange(21, rnge) is False
+
+
+def test_timecodeRange():
+    store = settings.Global.totalDataPoints
+    settings.Global.totalDataPoints = 100
+    assert helper.timecodeRange(10, 20) == [(10, 20)]
+    assert helper.timecodeRange(90, 20) == [(90, 100), (0, 20)]
+    assert helper.timecodeRange(-10, 20) == [(90, 100), (0, 20)]
+    assert helper.timecodeRange(-10, -5) == [(90, 95)]
+    assert helper.timecodeRange(0, 100) == [(0, 100)]
+    assert helper.timecodeRange(5, 110) == [(5, 10)]
+
+    # Reset it for future tests
+    settings.Global.totalDataPoints = store
+
+
+def test_timecodeWrap():
+    store = settings.Global.totalDataPoints
+    settings.Global.totalDataPoints = 100
+
+    assert helper.timecodeWrap(50) == 50
+    assert helper.timecodeWrap(-5) == 95
+    assert helper.timecodeWrap(105) == 5
+    assert helper.timecodeWrap(0) == 0
+    assert helper.timecodeWrap(100) == 100
+
+    # Reset it for future tests
+    settings.Global.totalDataPoints = store
