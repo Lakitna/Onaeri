@@ -16,32 +16,7 @@ class Logger:
         }
         self._hr = "─" * 50
 
-        # Check if main logging folder exists and create if it doesn't
-        path = os.path.dirname(os.path.abspath(__file__))
-        self.folderPath = '%s/%s' % (path, self.settings['folder'])
-        if not os.path.exists(self.folderPath):
-            os.makedirs(self.folderPath)
-
-        # Remove old log files
-        for f in os.listdir(self.folderPath):
-            path = os.path.join(self.folderPath, f)
-            offset = time.time() - (self.settings['keepLogsFor'] * 86400)
-            if os.path.getmtime(path) < offset:
-                os.remove(path)
-
-        # Check if daily logging folder exists and create if it doesn't
-        self.folderPath = '%s/%s' % (
-            self.folderPath,
-            time.strftime(self.settings['datestamp'])
-        )
-        if not os.path.exists(self.folderPath):
-            os.makedirs(self.folderPath)
-
-        # Check if program log file exists and create if it doesn't
-        filePath = "%s/%s" % (self.folderPath, self.settings['programLog'])
-        if not os.path.isfile(filePath) or not os.path.getsize(filePath) > 0:
-            with open(filePath, 'w') as f:
-                self.__call__("Log opened on [datetime]")
+        self.fileManagement()
 
         self._writeToFile("\nProgram started\n")
         self._writeToFile("%s\n" % self._hr)
@@ -172,6 +147,34 @@ class Logger:
         )
 
         return string
+
+    def fileManagement(self):
+        # Check if main logging folder exists and create if it doesn't
+        path = os.path.dirname(os.path.abspath(__file__))
+        self.folderPath = '%s/%s' % (path, self.settings['folder'])
+        if not os.path.exists(self.folderPath):
+            os.makedirs(self.folderPath)
+
+        # Remove old log files
+        for f in os.listdir(self.folderPath):
+            path = os.path.join(self.folderPath, f)
+            offset = time.time() - (self.settings['keepLogsFor'] * 86400)
+            if os.path.getmtime(path) < offset:
+                os.remove(path)
+
+        # Check if daily logging folder exists and create if it doesn't
+        self.folderPath = '%s/%s' % (
+            self.folderPath,
+            time.strftime(self.settings['datestamp'])
+        )
+        if not os.path.exists(self.folderPath):
+            os.makedirs(self.folderPath)
+
+        # Check if program log file exists and create if it doesn't
+        filePath = "%s/%s" % (self.folderPath, self.settings['programLog'])
+        if not os.path.isfile(filePath) or not os.path.getsize(filePath) > 0:
+            with open(filePath, 'w') as f:
+                self.__call__("Log opened on [datetime]")
 
 
 log = Logger()

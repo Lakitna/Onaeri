@@ -12,7 +12,7 @@ class Cycle:
     """
     Cycle a group of lamps
     """
-    def __init__(self, name, devices, timeKeeper):
+    def __init__(self, name, devices, timeKeeper, scheduler):
         log("Setting up cycle named %s: " % name, end="", flush=True)
 
         if len(devices) == 0:
@@ -37,10 +37,19 @@ class Cycle:
                                            self.settings)
             self.lamp[id] = Lamp()
             self.prevLamp[id] = Lamp()
-            settings.dynamic.set(id,
-                                 "power",
-                                 {'off': self.lookup.anatomy['night'][0][0],
-                                  'on': self.lookup.anatomy['morning'][0][0]})
+
+            # Set some dynamic settings for lamp
+            data = {'off': self.lookup.anatomy['night'][0][0],
+                    'on': self.lookup.anatomy['morning'][0][0]}
+            settings.dynamic.set(id, "power", data)
+
+            # Schedule resetting the lamps dynamic power settings
+            scheduler.add(
+                timecodeWrap(data['on'] - 10),
+                settings.dynamic.set,
+                "Reset dynamic settings for %s" % id,
+                args={"id": id, "group": "power", "data": data}
+            )
 
         log.success("Done")
 
