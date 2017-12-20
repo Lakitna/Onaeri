@@ -1,4 +1,3 @@
-import time
 from .settings import dynamic
 from .logger import log
 
