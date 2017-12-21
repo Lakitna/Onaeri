@@ -17,7 +17,7 @@ class Cycle:
 
         if len(devices) == 0:
             log.error("No lamps found with partial name `%s`." % name)
-            exit()
+
         self.devices = devices
         self.name = name
         self.update = False

@@ -3,7 +3,7 @@ Onaeri API
 https://github.com/Lakitna/Onaeri
 """
 
-__version__ = '0.5.0'
+__version__ = '0.6.0'
 
 from .logger import log
 from .cycle import Cycle
