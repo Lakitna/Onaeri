@@ -53,10 +53,16 @@ class TimeKeeper:
 
     @property
     def timestamp(self):
+        timestamp()
+
+    def timestamp(self, code=None):
         """
         Return the timestring of a timecode
         """
-        minutes = self.latestCode * self._minPerTimeCode
+        if code is None:
+            code = self.latestCode
+
+        minutes = code * self._minPerTimeCode
         h = math.floor(minutes / 60)
         m = math.floor(minutes % 60)
         s = math.floor((minutes % 1) * 60)

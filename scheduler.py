@@ -26,7 +26,13 @@ class Scheduler:
                 time = (time, 0)
             time = self.time.code(h=time[0], m=time[1], dry=True)
 
-        self.events[keyExists(time)] = (function, description, args)
+        time = keyExists(time)
+        self.events[time] = (function, description, args)
+
+        log.blind("\nScheduled an event for %s:" % self.time.timestamp(time))
+        log.blind("\tDescription: %s" % description)
+        log.blind("\tFunction: %s" % function)
+        log.blind("\tArguments: %s" % args)
 
     def tick(self):
         """
