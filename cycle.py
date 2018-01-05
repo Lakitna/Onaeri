@@ -45,7 +45,7 @@ class Cycle:
 
             # Schedule resetting the lamps dynamic power settings
             scheduler.add(
-                timecodeWrap(data['on'] - 10),
+                timecodeWrap(data['on'] - settings.Global.schedulerLampOffset),
                 settings.dynamic.set,
                 "Reset dynamic settings for %s" % id,
                 args={"id": id, "group": "power", "data": data}

@@ -60,6 +60,7 @@ _checkIntegrity(Global.mainLoopDelay, check="unsigned", tag="Global")
 _checkIntegrity(Global.settingFileExtention, check="string", tag="Global")
 _checkIntegrity(Global.valRange, check="unsigned", tag="Global")
 _checkIntegrity(Global.dataRange, check="unsigned", tag="Global")
+_checkIntegrity(Global.schedulerLampOffset, check="unsigned", tag="Global")
 
 _checkIntegrity(data.brightness['day'], Global.dataRange, tag="Data")
 _checkIntegrity(data.brightness['night'], Global.dataRange, tag="Data")
