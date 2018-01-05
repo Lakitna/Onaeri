@@ -51,10 +51,6 @@ class TimeKeeper:
             self.latestCode = ret
         return ret
 
-    @property
-    def timestamp(self):
-        timestamp()
-
     def timestamp(self, code=None):
         """
         Return the timestring of a timecode
