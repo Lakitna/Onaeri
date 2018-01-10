@@ -40,13 +40,10 @@ class Scheduler:
         """
         if self.time.update:
             if self.time.latestCode in self.events:
+                log("[Scheduler] Timed event triggered at [time]: %s"
+                    % self.events[self.time.latestCode][1])
                 try:
                     event = self.events[self.time.latestCode]
                     event[0](**event[2])
                 except TypeError:
-                    log.error("[Scheduler] Timed event could not be " +
-                              "triggered at [time]: %s"
-                              % self.events[self.time.latestCode][1])
-                else:
-                    log("[Scheduler] Timed event triggered at [time]: %s"
-                        % self.events[self.time.latestCode][1])
+                    log.error("[Scheduler] Timed event could not be triggered")
