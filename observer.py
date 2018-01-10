@@ -46,7 +46,8 @@ class Observer:
             newData.brightness = limitTo(newData.brightness, valRange)
 
             if not self._legalChange:
-                self.data = self._sameData(newData, self.data)
+                self._detectChange(newData, self.data)
+                self.data = newData
             else:
                 self.data = newData
 
@@ -59,23 +60,21 @@ class Observer:
         """
         self._legalChange = True
 
-    def _sameData(self, new, prev):
+    def _detectChange(self, new, prev):
         """
         Compare new to previous lamp values.
         Returns lamp object and sets update flag.
         """
-        if not prev == new:
-            lamp = Lamp()
-            lamp.copy(new)
+        change = False
+        lamp = Lamp()
+        valList = ['brightness', 'color', 'power']
 
-            if lamp.brightness == prev.brightness:
-                lamp.brightness = None
-            if lamp.color == prev.color:
-                lamp.color = None
-            if lamp.power == prev.power:
-                lamp.power = None
+        for val in valList:
+            if getattr(new, val) != getattr(prev, val):
+                setattr(lamp, val, getattr(new, val))
+                change = True
 
+        if change:
             log.highlight("[[time]] Change detected in %s: %s"
                           % (self._cycleName, lamp))
             self.update = True
-        return new
