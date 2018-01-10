@@ -43,6 +43,6 @@ def test_timestamp():
     t = TimeKeeper()
     t._minPerTimeCode = 1
     t.code(h=12, m=30, s=10)
-    assert t.timestamp == "12:30:00"
+    assert t.timestamp() == "12:30:00"
     t.code(h=12, m=1, s=30)
-    assert t.timestamp == "12:01:00"
+    assert t.timestamp() == "12:01:00"

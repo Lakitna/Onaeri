@@ -3,11 +3,12 @@ Onaeri API
 https://github.com/Lakitna/Onaeri
 """
 
-__version__ = '0.5.0'
+__version__ = '0.6.0'
 
 from .logger import log
 from .cycle import Cycle
 from .timekeeper import TimeKeeper
+from .scheduler import Scheduler
 from . import settings
 
 
@@ -17,6 +18,7 @@ class Onaeri:
     """
     def __init__(self, devices):
         self.time = TimeKeeper()
+        self.scheduler = Scheduler(self.time)
         self.cycles = []
         self.update = False
         self.devices = devices
@@ -27,7 +29,7 @@ class Onaeri:
                 if cycleName.lower() in l.name.lower():
                     lamps[l.name] = l
             self.cycles.append(
-                Cycle(cycleName, lamps, self.time)
+                Cycle(cycleName, lamps, self.time, self.scheduler)
             )
 
     def tick(self, lampDataList=None):
@@ -59,3 +61,4 @@ class Onaeri:
                     ), id)
 
         self.time.tick()
+        self.scheduler.tick()

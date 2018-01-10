@@ -100,7 +100,7 @@ def _reset(id):
         f.write(json.dumps(fileTemplate))
 
 
-def _cleanup(days=Global.dynamicSettingsKeep):
+def cleanup(days=Global.dynamicSettingsKeep):
     """
     Remove old dynamic settings
     """
@@ -124,4 +124,4 @@ def _cleanup(days=Global.dynamicSettingsKeep):
             log("[Cleanup] Removed old dynamic settings file `%s`." % f)
 
 
-_cleanup()
+cleanup()
