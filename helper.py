@@ -83,10 +83,14 @@ def inRange(val, rnge):
         return False
 
     if type(rnge[0]) is int:
+        if rnge[0] > rnge[1]:
+            rnge = (rnge[1], rnge[0])
         if rnge[0] <= val <= rnge[1]:
             return True
     else:
         for r in rnge:
+            if r[0] > r[1]:
+                r = (r[1], r[0])
             if r[0] <= val <= r[1]:
                 return True
     return False

@@ -40,6 +40,9 @@ def get(id, groups=None):
     else:
         ret = content
 
+    if len(ret) == 1:
+        ret = ret[sorted(ret.keys())[0]]
+
     set(id, 'meta', {'called': time.time()})
 
     return ret

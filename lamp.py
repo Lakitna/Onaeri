@@ -9,9 +9,11 @@ class Lamp:
     """
     def __init__(self, brightness=None, color=None,
                  power=None, name=None, mode=None,
-                 features=None):
+                 features=None, hue=None, sat=None):
         self._brightness = brightness
         self._color = color
+        self._hue = hue
+        self._sat = sat
         self._power = power
         self._name = name
         self._mode = mode
@@ -30,25 +32,24 @@ class Lamp:
         """
         Return all values that aren't None as string
         """
+        blacklist = ['_features']
         ret = {}
         for var in self.__dict__:
-            val = getattr(self, var)
-            if val is not None:
-                ret[var.lstrip("_")] = val
+            if var not in blacklist:
+                val = getattr(self, var)
+                if val is not None:
+                    ret[var.lstrip("_")] = val
         return str(ret)
 
     def __eq__(self, other):
         """
         Compare with other object of same type
         """
-        ret = True
-        if not self._brightness == other._brightness:
-            ret = False
-        if not self._color == other._color:
-            ret = False
-        if not self._power == other._power:
-            ret = False
-        return ret
+        vals = ['brightness', 'color', 'power', 'hue', 'sat']
+        for v in vals:
+            if not getattr(self, "_%s" % v) == getattr(other, "_%s" % v):
+                return False
+        return True
 
     def copy(self, obj):
         """
@@ -123,6 +124,34 @@ class Lamp:
             self._color = value
         else:
             log.warn("[Lamp] Color input value error. " +
+                     "%d given, allowed range %s" % (value, str(valRange)))
+
+    @property
+    def hue(self):
+        return self._hue
+
+    @hue.setter
+    def hue(self, value):
+        if value is None:
+            self._hue = None
+        elif inRange(value, valRange):
+            self._hue = value
+        else:
+            log.warn("[Lamp] Hue input value error. " +
+                     "%d given, allowed range %s" % (value, str(valRange)))
+
+    @property
+    def sat(self):
+        return self._sat
+
+    @sat.setter
+    def sat(self, value):
+        if value is None:
+            self._sat = None
+        elif inRange(value, valRange):
+            self._sat = value
+        else:
+            log.warn("[Lamp] Saturation input value error. " +
                      "%d given, allowed range %s" % (value, str(valRange)))
 
     @property

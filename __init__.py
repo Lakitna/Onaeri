@@ -28,6 +28,10 @@ class Onaeri:
             for l in self.devices:
                 if cycleName.lower() in l.name.lower():
                     lamps[l.name] = l
+                    settings.dynamic.set(l.name,
+                                         "features",
+                                         l.features)
+
             self.cycles.append(
                 Cycle(cycleName, lamps, self.time, self.scheduler)
             )

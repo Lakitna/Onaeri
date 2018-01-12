@@ -55,7 +55,7 @@ class Cycle:
 
     def tick(self, lampData):
         """
-        Progress cycle.
+        Progress cycle by an arbitrary time unit.
         """
         self.update = False
 
@@ -116,25 +116,29 @@ class Cycle:
         Apply some dynamic settings
         """
         dynamicSettings = settings.dynamic.get(id)
-        if lamp.brightness is not None and dynamicSettings['features']['dim']:
-            lamp.brightness = scale(
-                lamp.brightness,
-                settings.Global.valRange,
-                (dynamicSettings['min']['brightness'],
-                 dynamicSettings['max']['brightness'])
-            )
-        else:
-            lamp.brightness = None
+        vals = [
+            {'val': 'brightness', 'feature': 'dim', 'setting': 'brightness'},
+            {'val': 'color', 'feature': 'temp', 'setting': 'color'},
+            {'val': 'sat', 'feature': 'color', 'setting': 'color'},
+        ]
 
-        if lamp.color is not None and dynamicSettings['features']['temp']:
-            lamp.color = scale(
-                lamp.color,
-                settings.Global.valRange,
-                (dynamicSettings['min']['color'],
-                 dynamicSettings['max']['color'])
-            )
-        else:
-            lamp.color = None
+        for v in vals:
+            if (getattr(lamp, v['val']) is not None
+               and dynamicSettings['features'][v['feature']]):
+                setattr(lamp, v['val'], scale(
+                    getattr(lamp, v['val']),
+                    settings.Global.valRange,
+                    (dynamicSettings['min'][v['setting']],
+                     dynamicSettings['max'][v['setting']])
+                ))
+            else:
+                setattr(lamp, v['val'], None)
+
+        lamp.features = dynamicSettings['features']
+
+        if lamp.sat is not None and lamp.hue is None and lamp.color is None:
+            lamp.color = lamp.sat
+            lamp.sat = None
 
         lamp.power = None
         if self.time.latestCode == dynamicSettings['power']['off']:
@@ -174,24 +178,23 @@ class Cycle:
 
         lamp = Lamp()
         if update():
-            if not new.brightness == self.prevLamp[id].brightness:
-                lamp.brightness = new.brightness
-            if not new.color == self.prevLamp[id].color:
-                lamp.color = new.color
-            if not new.power == self.prevLamp[id].power:
-                lamp.power = new.power
+            vals = ['brightness', 'color', 'hue', 'sat', 'power']
+            for v in vals:
+                if not getattr(new, v) == getattr(self.prevLamp[id], v):
+                    setattr(lamp, v, getattr(new, v))
 
             if lamp.power is True:
-                lamp.brightness = new.brightness
-                lamp.color = new.color
+                for v in vals:
+                    if not v == 'power':
+                        setattr(lamp, v, getattr(new, v))
 
             lamp.mode = new.mode
-
             if lamp.mode == 'dark' and len(self.devices) > 1:
                 if 'dark' in id.lower():
                     lamp.brightness = None
                     lamp.power = False
 
+            lamp.features = new.features
             lamp.name = id
             self.update = True
             self.observer[id].legalChange

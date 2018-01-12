@@ -71,6 +71,8 @@ class Lookup:
         )
         if inRange(timeCode, darkrange):
             self.lamp.mode = 'dark'
+        elif timeCode == darkrange[0][0]:
+            self.lamp.mode = 'alert'
         else:
             self.lamp.mode = None
 
