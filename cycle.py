@@ -117,14 +117,19 @@ class Cycle:
         """
         dynamicSettings = settings.dynamic.get(id)
         vals = [
-            {'val': 'brightness', 'feature': 'dim', 'setting': 'brightness'},
-            {'val': 'color', 'feature': 'temp', 'setting': 'color'},
-            {'val': 'sat', 'feature': 'color', 'setting': 'color'},
+            {'val': 'brightness', 'feature': ['dim'], 'setting': 'brightness'},
+            {'val': 'color', 'feature': ['temp', 'color'], 'setting': 'color'},
+            {'val': 'sat', 'feature': ['color'], 'setting': 'color'},
         ]
 
         for v in vals:
-            if (getattr(lamp, v['val']) is not None
-               and dynamicSettings['features'][v['feature']]):
+            def canDo():
+                for f in v['feature']:
+                    if dynamicSettings['features'][f]:
+                        return True
+                return False
+
+            if getattr(lamp, v['val']) is not None and canDo():
                 setattr(lamp, v['val'], scale(
                     getattr(lamp, v['val']),
                     settings.Global.valRange,
@@ -135,10 +140,10 @@ class Cycle:
                 setattr(lamp, v['val'], None)
 
         lamp.features = dynamicSettings['features']
-
-        if lamp.sat is not None and lamp.hue is None and lamp.color is None:
-            lamp.color = lamp.sat
-            lamp.sat = None
+        if dynamicSettings['features']['color'] and lamp.mode == 'alert':
+            lamp.color = None
+            lamp.hue = 333
+            lamp.sat = 1000
 
         lamp.power = None
         if self.time.latestCode == dynamicSettings['power']['off']:

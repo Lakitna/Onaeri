@@ -32,7 +32,7 @@ class Lamp:
         """
         Return all values that aren't None as string
         """
-        blacklist = ['_features']
+        blacklist = ['_features', '_name']
         ret = {}
         for var in self.__dict__:
             if var not in blacklist:

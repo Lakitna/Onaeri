@@ -69,10 +69,10 @@ class Lookup:
             self._sleepTime - self._windDownTime,
             self.anatomy['night'][-1][1] - self._alarmOffset
         )
-        if inRange(timeCode, darkrange):
-            self.lamp.mode = 'dark'
-        elif timeCode == darkrange[0][0]:
+        if timeCode == darkrange[0][0]:
             self.lamp.mode = 'alert'
+        elif inRange(timeCode, darkrange):
+            self.lamp.mode = 'dark'
         else:
             self.lamp.mode = None
 
