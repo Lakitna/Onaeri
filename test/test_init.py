@@ -4,11 +4,12 @@ from .. import settings
 
 
 def test_init():
+    features = {'dim': True, 'temp': True, 'color': False}
     devices = [
-        Lamp(100, 50, True, name="Template One"),
-        Lamp(80, 50, True, name="Template Two"),
-        Lamp(50, 50, True, name="Template Three"),
-        Lamp(30, 50, True, name="Template Four"),
+        Lamp(100, 50, True, name="Template One", features=features),
+        Lamp(80, 50, True, name="Template Two", features=features),
+        Lamp(50, 50, True, name="Template Three", features=features),
+        Lamp(30, 50, True, name="Template Four", features=features),
     ]
     settings.cycles = ["Template"]
     settings.dynamic._reset("Template One")
@@ -22,11 +23,12 @@ def test_init():
 
 
 def test_tick(capsys):
+    features = {'dim': True, 'temp': True, 'color': False}
     devices = [
-        Lamp(100, 50, True, name="Template One"),
-        Lamp(80, 50, True, name="Template Two"),
-        Lamp(50, 50, True, name="Template Three"),
-        Lamp(30, 50, True, name="Template Four"),
+        Lamp(100, 50, True, name="Template One", features=features),
+        Lamp(80, 50, True, name="Template Two", features=features),
+        Lamp(50, 50, True, name="Template Three", features=features),
+        Lamp(30, 50, True, name="Template Four", features=features),
     ]
     settings.cycles = ["Template"]
     settings.dynamic._reset("Template One")
