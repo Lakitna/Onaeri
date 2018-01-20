@@ -11,7 +11,7 @@ matrix:
         - python: "3.6-dev"
           env: TOXENV=py36
 install:
-    - pip install -U tox coveralls
+    - pip install -U tox coveralls flake8
 language: python
 script:
     - python3 test
