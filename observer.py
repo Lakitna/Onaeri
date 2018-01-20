@@ -1,7 +1,6 @@
 from .lamp import Lamp
-import sys
 from .helper import limitTo
-from .logger import *
+from .logger import log
 from .settings.Global import valRange
 
 

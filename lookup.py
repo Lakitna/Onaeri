@@ -5,7 +5,6 @@ from .lamp import Lamp
 from .logger import log
 
 from . import settings
-import time
 
 
 class Lookup:

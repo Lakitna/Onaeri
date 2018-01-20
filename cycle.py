@@ -1,4 +1,3 @@
-import time
 from .lookup import Lookup
 from .helper import sequenceResize, inRange, limitTo, scale, timecodeWrap
 from . import data
