@@ -1,4 +1,4 @@
-from ..timekeeper import TimeKeeper
+from ..Onaeri.timekeeper import TimeKeeper
 
 
 def test_tick():

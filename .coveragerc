@@ -1,4 +1,10 @@
 [run]
+source = Onaeri
+
+omit =
+    Onaeri/__main__.py
+    Onaeri/settings/Template.py
+    Onaeri/settings/Global.py
 
 [report]
 # Regexes for lines to exclude from consideration

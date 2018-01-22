@@ -1,5 +1,5 @@
-from .. import helper
-from .. import settings
+from ..Onaeri import helper
+from ..Onaeri import settings
 
 
 def test_scale():

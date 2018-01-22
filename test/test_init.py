@@ -1,6 +1,6 @@
-from .. import Onaeri
-from ..lamp import Lamp
-from .. import settings
+from ..Onaeri import Onaeri
+from ..Onaeri.lamp import Lamp
+from ..Onaeri import settings
 
 
 def test_init():

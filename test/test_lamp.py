@@ -1,4 +1,4 @@
-from ..lamp import Lamp
+from ..Onaeri.lamp import Lamp
 
 
 def test_set_get():
