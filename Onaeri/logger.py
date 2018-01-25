@@ -1,4 +1,5 @@
 import os
+import shutil
 import time
 
 __all__ = ["log"]
@@ -160,7 +161,7 @@ class Logger:
             path = os.path.join(self.folderPath, f)
             offset = time.time() - (self.settings['keepLogsFor'] * 86400)
             if os.path.getmtime(path) < offset:
-                os.remove(path)
+                shutil.rmtree(path)
 
         # Check if daily logging folder exists and create if it doesn't
         self.folderPath = '%s/%s' % (
