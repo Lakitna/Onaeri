@@ -63,56 +63,83 @@ class Cycle:
                 self.observer[id].look(lampData[id])
 
             if self.time.update or self.observer[id].update:
-                newVals = self.lookup.table(self.time.latestCode)
-                newVals.name = id
-
-                if (self.observer[id].update
-                   and not self.observer[id].turnedOn
-                   and not self.observer[id].turnedOff):
-                    if self.lookup.period == 'evening':
-                        self.deviation[id].change(newVals,
-                                                  self.observer[id].data,
-                                                  self.time.latestCode)
-                    elif self.lookup.period == 'day':
-                        settings.dynamic.set(
-                            id,
-                            'max',
-                            self.observer[id].data(),
-                            keys=['brightness', 'color']
-                        )
-                    elif self.lookup.period == 'night':
-                        settings.dynamic.set(
-                            id,
-                            'min',
-                            self.observer[id].data(),
-                            keys=['brightness', 'color']
-                        )
-
-                newVals = self._applyDynamicSettings(id, newVals)
-
-                if self.observer[id].turnedOff:
-                    self.lamp[id].power = False
-                elif self.observer[id].turnedOn:
-                    if newVals.mode == 'dark' and 'dark' in id.lower():
-                        self.lamp[id].power = False
-                        self.lamp[id].brightness = None
-                    else:
-                        self.lamp[id].copy(newVals)
-                        self.lamp[id].power = None
-                    self.update = True
-                    self.observer[id].legalChange
-                    self.deviation[id].reset()
-                else:
-                    newVals = self.deviation[id].apply(newVals)
-                    self.lamp[id] = self._compareWithPrevious(newVals, id)
-
-                self.prevLamp[id].copy(newVals)
+                lamp = self._updateDevice(id)
+                self.prevLamp[id].copy(lamp)
 
         return self.update
 
+    def _updateDevice(self, id):
+        """
+        Update a device
+        """
+        newVals = self.lookup.table(self.time.latestCode)
+        newVals.name = id
+
+        observer = self.observer[id]
+        if self.observer[id].turnedOff:
+            self.lamp[id].power = False
+
+        elif self.observer[id].turnedOn:
+            if newVals.mode == 'dark' and 'dark' in id.lower():
+                self.lamp[id].power = False
+                self.lamp[id].brightness = None
+            else:
+                newVals = self._applyDynamicSettings(id, newVals)
+                self.lamp[id].copy(newVals)
+                self.lamp[id].power = None
+            self.update = True
+            self.observer[id].legalChange
+            self.deviation[id].reset()
+
+        else:
+            if self.observer[id].update:
+                self._periodBasedEvents(id, newVals)
+
+            newVals = self.deviation[id].apply(newVals)
+            newVals = self._applyDynamicSettings(id, newVals)
+            self.lamp[id] = self._compareWithPrevious(newVals, id)
+
+        return newVals
+
+    def _periodBasedEvents(self, id, newVals):
+        """
+        Handle user events based on period of day
+        """
+        period = self.lookup.period
+
+        if period == 'evening':
+            # Temporary cycle deviation
+            self.deviation[id].change(newVals,
+                                      self.observer[id].data,
+                                      self.time.latestCode)
+
+        elif period == 'day':
+            # Change max color and brightness
+            settings.dynamic.set(
+                id,
+                'max',
+                self.observer[id].data(),
+                keys=['brightness', 'color']
+            )
+
+        elif period == 'night':
+            # Change min color and brightness
+            settings.dynamic.set(
+                id,
+                'min',
+                self.observer[id].data(),
+                keys=['brightness', 'color']
+            )
+
+        elif period == 'morning':
+            return
+        else:
+            log.warn("Unknown period %s" % period)
+            return
+
     def _applyDynamicSettings(self, id, lamp):
         """
-        Apply some dynamic settings
+        Apply dynamic settings
         """
         dynamicSettings = settings.dynamic.get(id)
         vals = [
@@ -244,8 +271,12 @@ class Deviation:
                 self.setValues['brightness'] = (changeVals.brightness
                                                 - dataVals.brightness)
 
-            if not inRange(self.setValues['brightness'], (-10, 10)) \
-               or not inRange(self.setValues['color'], (-10, 10)):
+            valRange = settings.Global.valRange
+            rnge = (valRange[1] - valRange[0]) // 100
+            rnge = (-rnge, rnge)  # (-10, 10) for valRange = (0, 1000)
+
+            if not inRange(self.setValues['brightness'], rnge) \
+               or not inRange(self.setValues['color'], rnge):
                 self.values = self.setValues.copy()
                 self.active = True
 
