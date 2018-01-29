@@ -75,7 +75,6 @@ class Cycle:
         newVals = self.lookup.table(self.time.latestCode)
         newVals.name = id
 
-        observer = self.observer[id]
         if self.observer[id].turnedOff:
             self.lamp[id].power = False
 
