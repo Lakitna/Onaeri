@@ -56,9 +56,11 @@ class Onaeri:
 
             if self.time.update:
                 for id in cycle.lamp:
-                    log.blind("[time]\t%s\t%s\t%s\t%s\t%s" % (
+                    log.blind("[time]\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (
                         cycle.observer[id].data.brightness,
                         cycle.observer[id].data.color,
+                        cycle.observer[id].data.hue,
+                        cycle.observer[id].data.sat,
                         cycle.observer[id].data.power,
                         cycle.observer[id].update,
                         cycle.deviation[id].active

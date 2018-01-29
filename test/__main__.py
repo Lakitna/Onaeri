@@ -7,7 +7,6 @@ Create a setting file for the test procedure
 """
 folderPath = os.path.dirname(os.path.abspath(__file__))
 folderPath = os.path.split(folderPath)[0] + "/Onaeri/settings"
-print(folderPath)
 
 srcfile = folderPath + '/Template.py'
 dstfile = folderPath + '/test.py'

@@ -111,10 +111,12 @@ class Logger:
         """
         Build file headers
         """
-        return "%s\t%s\t%s\t%s\t%s\t%s\n" % (
+        return "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" % (
             "Timestamp",
             "Brightness",
-            "Color",
+            "Temperature",
+            "Hue",
+            "Saturation",
             "Power",
             "Observer update",
             "Deviation active"

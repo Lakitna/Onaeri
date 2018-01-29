@@ -5,15 +5,15 @@
 log
 
 # Personal settings
-settings/Sander.py
-settings/Jurrien.py
-settings/Hallway.py
+Onaeri/settings/Sander.py
+Onaeri/settings/Jurrien.py
+Onaeri/settings/Hallway.py
 
 # Dynamic settings
-settings/dynamic/*.json
+Onaeri/settings/dynamic/*.json
 
 # log files
-log
+Onaeri/log
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
