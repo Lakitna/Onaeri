@@ -26,7 +26,7 @@ Advanced settings
 morningSlopeDuration = 60
 
 # Duration of eveningslope in minutes
-eveningSlopeDuration = 500
+eveningSlopeDuration = 400
 
 # Minimum time in minutes a duration cycle should run
 deviationDuration = 30
