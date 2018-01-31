@@ -91,13 +91,17 @@ class Logger:
         self.row()
         for key in values:
             if type(values[key]) is dict:
-                self.__call__("%s:" % key)
+                self.__call__("\033[1;30m%s\033[0;0m:" % key)
                 for subkey in values[key]:
-                    self.__call__("\t%s:\t\t%s" % (
-                        subkey, values[key][subkey])
+                    spacing = " " * (20 - len(subkey))
+                    self.__call__("    %s:%s%s" % (
+                        subkey, spacing, values[key][subkey])
                     )
             else:
-                self.__call__("%s:\t\t%s" % (key, values[key]))
+                spacing = " " * (24 - len(key))
+                self.__call__("\033[1;30m%s\033[0;0m:%s%s" % (
+                    key, spacing, values[key])
+                )
         self.__call__()
         self._writeToFile("\n\n\n\n\n")
 
