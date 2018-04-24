@@ -1,71 +1,143 @@
+import pytest
 from ..lamp import Lamp
 
 
-def test_set_get():
-    l = Lamp()
-    l.brightness = 10
-    assert l.brightness == 10
-    l.color = 20
-    assert l.color == 20
-    l.power = True
-    assert l.power is True
-    l.mode = 'hello'
-    assert l.mode == 'hello'
-    l.name = 'world'
-    assert l.name == 'world'
+set_get_test_cases = (
+    ("variable", "comment", "test_input", "expected_result", "_assert"),
+    [
+        ("brightness", "valid int", 10, 10, True),
+        ("brightness", "invalid int", 10, 11, False),
+        ("brightness", "invalid int range", -1, -1, False),
+        ("brightness", "invalid str", 'string', 'string', False),
+        ("brightness", "none", None, None, True),
+
+        ("color", "valid int", 20, 20, True),
+        ("color", "invalid int", 20, 21, False),
+        ("color", "invalid int range", -1, -1, False),
+        ("color", "invalid str", 'string', 'string', False),
+        ("color", "none", None, None, True),
+
+        ("power", "valid bool", False, False, True),
+        # ("power", "valid bool", True, True, True),
+        ("power", "none", None, None, True),
+        ("power", "invalid bool", True, False, False),
+        ("power", "invalid str", 'string', 'string', False),
+
+        ("mode", "valid int", 30, 30, True),
+        ("mode", "valid str", 'randomString', 'randomString', True),
+        ("mode", "none", None, None, True),
+
+        ("name", "valid int", 30, 30, True),
+        ("name", "valid str", 'randomString', 'randomString', True),
+        ("name", "none", None, None, True),
+    ]
+)
 
 
-def test_init():
-    l = Lamp()
-    assert l.brightness is None
-    assert l.color is None
-    assert l.power is None
-    assert l.name is None
-    assert l.mode is None
-
-    l = Lamp(100, 90, True, "testName", "testMode")
-    assert l.brightness == 100
-    assert l.color == 90
-    assert l.power is True
-    assert l.name == "testName"
-    assert l.mode == "testMode"
+@pytest.mark.parametrize(*set_get_test_cases)
+def test_lamp_value_setting(variable, comment,
+                            test_input, expected_result, _assert):
+    lamp = Lamp()
+    setattr(lamp, variable, test_input)
+    assert _assert is (getattr(lamp, variable) == expected_result)
 
 
-def test_call():
-    l = Lamp(100, 90, True, "testName", "testMode")
-    assert type(l()) is dict
-    assert l()['brightness'] == 100
+def test_init_empty():
+    lamp = Lamp()
+    assert lamp.brightness is None
+    assert lamp.color is None
+    assert lamp.power is None
+    assert lamp.name is None
+    assert lamp.mode is None
 
 
-def test_eq():
-    a = Lamp(100, 90, True, "testName", "testMode")
-    b = Lamp(100, 90, True, "testName", "testMode")
-    assert a == b
-    b = Lamp(100, 95, True, "testName", "testMode")
-    assert not a == b
-    b = Lamp(50, 90, True, "testName", "testMode")
-    assert not a == b
-    b = Lamp(100, 90, False, "testName", "testMode")
-    assert not a == b
-    b = Lamp(100, 90, True, "Name", "Mode")
-    assert a == b
+def test_init_filled():
+    lamp = Lamp(100, 90, True, "testName", "testMode")
+    assert lamp.brightness == 100
+    assert lamp.color == 90
+    assert lamp.power is True
+    assert lamp.name == "testName"
+    assert lamp.mode == "testMode"
+
+
+def test_magic_call():
+    lamp = Lamp(100, 90, True, "testName", "testMode")
+    assert type(lamp()) is dict  # Correct type
+    assert len(lamp()) == 5  # Correct length
+    assert lamp()['brightness'] == 100  # Correctly callable
+
+
+magic_eq_test_cases = (
+    ("comment", "_assert", "test_input_a", "test_input_b"),
+    [
+        (
+            "equal", True,
+            [100, 90, True, "testName", "testMode"],
+            [100, 90, True, "testName", "testMode"]
+        ),
+        (
+            "inequal_brightness", False,
+            [100, 90, True, "testName", "testMode"],
+            [50, 90, True, "testName", "testMode"]
+        ),
+        (
+            "inequal_color", False,
+            [100, 90, True, "testName", "testMode"],
+            [100, 100, True, "testName", "testMode"]
+        ),
+        (
+            "inequal_power", False,
+            [100, 90, True, "testName", "testMode"],
+            [100, 90, False, "testName", "testMode"]
+        ),
+        (
+            "inequal_name", True,
+            [100, 90, True, "testName", "testMode"],
+            [100, 90, True, "anotherName", "testMode"]
+        ),
+        (
+            "inequal_mode", True,
+            [100, 90, True, "testName", "testMode"],
+            [100, 90, True, "testName", "anotherMode"]
+        )
+    ]
+)
+
+
+@pytest.mark.parametrize(*magic_eq_test_cases)
+def test_magic_eq(comment, _assert,
+                  test_input_a, test_input_b):
+    a = Lamp(*test_input_a)
+    b = Lamp(*test_input_b)
+    assert _assert is (a == b)
 
 
 def test_copy():
     a = Lamp(100, 90, True)
     b = Lamp()
+    assert not b == a
     b.copy(a)
     assert b == a
-    b = Lamp(20, 89, False)
-    b.copy(a)
-    assert b == a
+
+
+def test_isempty_true():
+    lamp = Lamp()
+    assert lamp.isEmpty() is True
+
+
+def test_isempty_false():
+    lamp = Lamp(100, 90, True)
+    assert lamp.isEmpty() is False
+
+
+def test_isempty_subset():
+    lamp = Lamp(100, 90, True)
+    assert lamp.isEmpty(['mode', 'name']) is True
+    assert lamp.isEmpty(['mode']) is True
 
 
 def test_empty():
-    l = Lamp(100, 50, False)
-    assert l.isEmpty() is False
-    l.empty()
-    assert l.isEmpty() is True
-    l = Lamp(100, None, None)
-    assert l.isEmpty(['color', 'power']) is True
-    assert l.isEmpty(['brightness', 'color']) is False
+    lamp = Lamp(100, 90, True)
+    assert lamp.isEmpty() is False
+    lamp.empty()
+    assert lamp.isEmpty() is True
