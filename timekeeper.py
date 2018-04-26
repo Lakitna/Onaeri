@@ -42,8 +42,7 @@ class TimeKeeper:
         if type(h) is tuple:
             if len(h) > 2:
                 s = h[2]
-            if len(h) > 1:
-                m = h[1]
+            m = h[1]
             h = h[0]
 
         ret = math.floor(((h * 60) + m + (s / 60)) / self._minPerTimeCode)
