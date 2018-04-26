@@ -1,6 +1,5 @@
 import pytest
 from ..Onaeri import helper
-from ..Onaeri import settings
 
 scale_test_cases = (
     ("comment", "test_input", "expected_result"),

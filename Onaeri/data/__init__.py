@@ -2,7 +2,6 @@ import json
 import os
 import sys
 from ..logger import log
-import pprint
 
 required = ['brightness', 'color', 'deviation']
 blacklist = ['__init__.py', 'logger.py']
@@ -14,14 +13,16 @@ expectedExtention = "json"
 folderPath = os.path.dirname(os.path.abspath(__file__))
 requiredData = list(required)
 
+
 def retrieve_file_names(path=None):
     """
-    Get file names from current folder, excluding invisible and blacklisted files
+    Get file names from current folder, excluding invisible and
+    blacklisted files.
     """
     folder = path or folderPath
     files = [f for f in os.listdir(folder)
-            if os.path.isfile(os.path.join(folder, f))
-            and not f.startswith(".") and f not in blacklist]
+             if os.path.isfile(os.path.join(folder, f))
+             and not f.startswith(".") and f not in blacklist]
 
     ret = []
     for f in files:
@@ -32,6 +33,7 @@ def retrieve_file_names(path=None):
         ret.append(tmp)
 
     return ret
+
 
 def valid_file(file, required=None):
     """
@@ -54,9 +56,10 @@ def valid_file(file, required=None):
             return True
     else:
         log.warn("[Data] Unexpected file " +
-                "`%s.%s` found." % (file['name'], file['extention']))
+                 "`%s.%s` found." % (file['name'], file['extention']))
         log.warn("[Data] Skipping file and moving on.")
         return False
+
 
 def expose_json_file_to_namespace(file):
     """
@@ -89,5 +92,6 @@ def do():
             expose_json_file_to_namespace(f)
 
     validate_required_data()
+
 
 do()

@@ -5,7 +5,6 @@ from .lamp import Lamp
 from .logger import log
 
 from . import settings
-import time
 
 
 class Lookup:
@@ -39,8 +38,8 @@ class Lookup:
 
         # Build lookup tables
         self.anatomy = self._buildAnatomy()
-        self.brightness = self._buildTable(data.brightness)
-        self.color = self._buildTable(data.color)
+        self.brightness = self._buildTable(data.brightness)  # pylint: disable
+        self.color = self._buildTable(data.color)  # pylint: disable
 
         # print(self.brightness)
         # print()

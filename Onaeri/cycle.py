@@ -1,4 +1,3 @@
-import time
 from .lookup import Lookup
 from .helper import sequenceResize, inRange, limitTo, scale, timecodeWrap
 from . import data
@@ -211,7 +210,8 @@ class Deviation:
         """
         self.reset()
         self.duration = self._calculateDuration(timeCode)
-        self.table = sequenceResize(data.deviation, self.duration)
+        self.table = sequenceResize(data.deviation,  # pylint: disable
+                                    self.duration)
 
         if changeVals.power and self.duration > 0:
             if changeVals.color is None:
