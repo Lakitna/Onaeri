@@ -1,7 +1,7 @@
-from .. import cycle
-from .. import settings
-from ..settings import Template as testSettings
-from ..lamp import Lamp
+from ..Onaeri import cycle
+from ..Onaeri import settings
+from ..Onaeri.settings import Template as testSettings
+from ..Onaeri.lamp import Lamp
 
 
 def test_change():

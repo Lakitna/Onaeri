@@ -1,5 +1,5 @@
-from ..lookup import Lookup
-from ..settings import Template as testSettings
+from ..Onaeri.lookup import Lookup
+from ..Onaeri.settings import Template as testSettings
 
 """
 It's hard to make automatic testers for Lookup. Visual inspection of the

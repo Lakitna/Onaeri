@@ -1,5 +1,5 @@
 import pytest
-from ..timekeeper import TimeKeeper
+from ..Onaeri.timekeeper import TimeKeeper
 
 
 @pytest.fixture

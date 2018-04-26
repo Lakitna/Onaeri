@@ -1,5 +1,5 @@
 import pytest
-from ..lamp import Lamp
+from ..Onaeri.lamp import Lamp
 
 
 set_get_test_cases = (

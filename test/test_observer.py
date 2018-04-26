@@ -1,6 +1,6 @@
 import pytest
-from ..observer import Observer
-from ..lamp import Lamp
+from ..Onaeri.observer import Observer
+from ..Onaeri.lamp import Lamp
 
 
 @pytest.fixture
