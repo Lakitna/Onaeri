@@ -12,9 +12,6 @@ settings/Hallway.py
 # Dynamic settings
 settings/dynamic/*.json
 
-# log files
-log
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -58,6 +55,7 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
+.pytest_cache
 nosetests.xml
 coverage.xml
 *.cover

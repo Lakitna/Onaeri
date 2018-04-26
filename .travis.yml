@@ -18,5 +18,5 @@ install:
 language: python
 script:
     - pytest
-    # - flake8
+    - flake8
 after_success: coveralls
