@@ -63,7 +63,6 @@ def timecodeRange(min, max, rngeMax=None):
     """
     if rngeMax is None:
         rngeMax = settings.Global.totalDataPoints
-    print(rngeMax)
 
     max = timecodeWrap(max, rngeMax)
     min = timecodeWrap(min, rngeMax)

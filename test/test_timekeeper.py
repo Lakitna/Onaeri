@@ -4,14 +4,12 @@ from ..Onaeri.timekeeper import TimeKeeper
 
 @pytest.fixture
 def timekeeper():
-    return TimeKeeper()
+    return TimeKeeper(
+        minpertimecode=1, latestcode=10, runtime=0, update=True
+    )
 
 
 def test_tick(timekeeper):
-    timekeeper._minPerTimeCode = 1
-    timekeeper.latestCode = 0
-    timekeeper.runtime = 0
-
     timekeeper.tick()
     assert timekeeper.update is True
     assert timekeeper.runtime == 1
@@ -41,26 +39,22 @@ make_code_test_cases = (
 
 @pytest.mark.parametrize(*make_code_test_cases)
 def test_make_code(comment, minPerTimeCode, kwargs, expected):
-    timekeeper = TimeKeeper()
-    timekeeper._minPerTimeCode = minPerTimeCode
+    timekeeper = TimeKeeper(minpertimecode=minPerTimeCode)
     assert timekeeper.code(**kwargs) == expected
     assert timekeeper.latestCode == expected
 
 
 def test_make_code_dry(timekeeper):
-    timekeeper._minPerTimeCode = 1
     timekeeper.code(1)
     assert timekeeper.code(2, dry=True) == 120
     assert timekeeper.latestCode == 60
 
 
 def test_timestamp_simple(timekeeper):
-    timekeeper._minPerTimeCode = 1
     timekeeper.code(h=12, m=30, s=10)
     assert timekeeper.timestamp == "12:30:00"
 
 
 def test_timestamp_with_seconds(timekeeper):
     timekeeper._minPerTimeCode = .123
-    print(timekeeper.code(h=12, m=1, s=30))
     assert timekeeper.timestamp == "12:01:23"
