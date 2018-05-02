@@ -89,7 +89,6 @@ current_period_test_cases = (
 @pytest.mark.parametrize(*current_period_test_cases)
 def test_current_period(comment, timecode, expected):
     look = lookup(config())
-    print(look.anatomy)
     assert look.get_period(timecode) == expected
 
 

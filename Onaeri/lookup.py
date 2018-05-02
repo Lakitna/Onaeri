@@ -74,7 +74,12 @@ class Lookup:
         Get period of day, based on latest timecode.
         """
         timeCode = timecode or self.time.latestCode
-        for period in self.anatomy:
+
+        # Fix for python v < 3.6
+        periods = list(self.anatomy.keys())
+        periods.sort()
+
+        for period in periods:
             if inRange(timeCode, self.anatomy[period]):
                 return period
     period = property(get_period)
@@ -105,7 +110,8 @@ class Lookup:
             self._alarmTime - self._alarmOffset,
             (self._alarmTime
              - self._alarmOffset
-             + self.config.morningSlopeDuration)
+             + self.config.morningSlopeDuration
+             )
         )
 
     def _calculate_eveningSlope_range(self):
@@ -138,5 +144,4 @@ class Lookup:
                     for timeCode in range(rnge[0], rnge[1]):
                         table[timeCode] = source[period][count]
                         count += 1
-
         return table
