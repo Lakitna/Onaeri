@@ -17,6 +17,6 @@ install:
     - pip install -U coveralls flake8
 language: python
 script:
-    - pytest
+    - coverage run -m pytest
     - flake8
 after_success: coveralls
