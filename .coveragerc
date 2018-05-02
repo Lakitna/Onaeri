@@ -1,7 +1,7 @@
 [run]
 branch = True
 omit =
-    /usr/local/lib/*/site-packages/*
+    */site-packages/*
     test/*
 
 [report]
