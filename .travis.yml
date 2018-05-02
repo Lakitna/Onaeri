@@ -14,7 +14,7 @@ cache:
   directories:
       - $HOME/.cache/pip
 install:
-    - pip install -U coveralls flake8
+    - pip install -U coveralls flake8 pytest
 language: python
 script:
     - coverage run -m pytest
