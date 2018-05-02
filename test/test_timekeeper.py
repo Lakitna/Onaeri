@@ -57,4 +57,5 @@ def test_timestamp_simple(timekeeper):
 
 def test_timestamp_with_seconds(timekeeper):
     timekeeper._minPerTimeCode = .123
+    timekeeper.code(h=12, m=1, s=24)
     assert timekeeper.timestamp == "12:01:23"
