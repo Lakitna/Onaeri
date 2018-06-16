@@ -75,7 +75,7 @@ class Lookup:
         """
         timeCode = timecode or self.time.latestCode
 
-        # Fix for python v < 3.6
+        # Fix for python v < 3.6 where dicts aren't sorted
         periods = list(self.anatomy.keys())
         periods.sort()
 
