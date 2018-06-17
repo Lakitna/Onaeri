@@ -5,17 +5,19 @@ from .lamp import Lamp
 from .logger import log
 
 from . import settings
-import time
 
 
 class Lookup:
     """
     Calculates and dispenses lookup tables for lamp values
     """
-    def __init__(self, config):
-        self.time = TimeKeeper()
+    def __init__(self, config,
+                 timekeeper=None, lamp=None, totaldatapoints=None):
+        self.time = timekeeper or TimeKeeper()
         self.config = config
-        self.lamp = Lamp()
+        self.lamp = lamp or Lamp()
+        self.totalDataPoints = (totaldatapoints
+                                or settings.Global.totalDataPoints)
 
         # Sleep rhythm settings
         self._alarmTime = self.time.code(self.config.alarmTime)
@@ -25,22 +27,13 @@ class Lookup:
         self._windDownTime = self.time.code(m=self.config.windDownTime)
 
         # Create morning and evening slopes based on sleep rhythm settings
-        self.morningSlope = timecodeRange(
-            self._alarmTime - self._alarmOffset,
-            (self._alarmTime
-             - self._alarmOffset
-             + self.config.morningSlopeDuration)
-        )
-
-        self.eveningSlope = timecodeRange(
-            self._sleepTime - self.config.eveningSlopeDuration,
-            self._sleepTime
-        )
+        self.morningSlope = self._calculate_morningSlope_range()
+        self.eveningSlope = self._calculate_eveningSlope_range()
 
         # Build lookup tables
         self.anatomy = self._buildAnatomy()
-        self.brightness = self._buildTable(data.brightness)
-        self.color = self._buildTable(data.color)
+        self.brightness = self._buildTable(data.brightness)  # pylint: disable
+        self.color = self._buildTable(data.color)  # pylint: disable
 
         # print(self.brightness)
         # print()
@@ -52,7 +45,7 @@ class Lookup:
 
     def table(self, timeCode):
         """
-        Get lamp values associated with timecode. Returns lamp object
+        Get lamp values associated with timecode. Returns lamp object.
         """
         self.lamp.color = scale(
             self.color[timeCode],
@@ -65,31 +58,44 @@ class Lookup:
             settings.Global.valRange
         )
 
-        period = self.period
-        darkrange = timecodeRange(self._sleepTime - self._windDownTime,
-                                  self._sleepTime)
-        if (period == 'night' or inRange(timeCode, darkrange)):
+        darkrange = timecodeRange(
+            self._sleepTime - self._windDownTime,
+            self.anatomy['night'][-1][1] - self._alarmOffset
+        )
+        if timeCode == darkrange[0][0]:
+            self.lamp.mode = 'alert'
+        elif inRange(timeCode, darkrange):
             self.lamp.mode = 'dark'
         else:
             self.lamp.mode = None
 
         return self.lamp
 
-    @property
-    def period(self):
-        timeCode = self.time.code()
-        for period in self.anatomy:
+    def get_period(self, timecode=None):
+        """
+        Get period of day, based on latest timecode.
+        """
+        timeCode = timecode or self.time.latestCode
+
+        # Fix for python v < 3.6 where dicts aren't sorted
+        periods = list(self.anatomy.keys())
+        periods.sort()
+
+        for period in periods:
             if inRange(timeCode, self.anatomy[period]):
                 return period
+    period = property(get_period)
 
     def _buildAnatomy(self):
         anatomy = {
             "morning": self.morningSlope,
             "day": timecodeRange(self.morningSlope[-1][1],
-                                 self.eveningSlope[0][0]),
+                                 self.eveningSlope[0][0],
+                                 rngeMax=self.totalDataPoints),
             "evening": self.eveningSlope,
             "night": timecodeRange(self.eveningSlope[-1][1],
-                                   self.morningSlope[0][0])
+                                   self.morningSlope[0][0],
+                                   rngeMax=self.totalDataPoints)
         }
 
         if (inRange(anatomy['morning'][-1][1], anatomy['evening'])
@@ -100,6 +106,21 @@ class Lookup:
             log.warn("Change your settings to fix this.")
 
         return anatomy
+
+    def _calculate_morningSlope_range(self):
+        return timecodeRange(
+            self._alarmTime - self._alarmOffset,
+            (self._alarmTime
+             - self._alarmOffset
+             + self.config.morningSlopeDuration
+             )
+        )
+
+    def _calculate_eveningSlope_range(self):
+        return timecodeRange(
+            self._sleepTime - self.config.eveningSlopeDuration,
+            self._sleepTime
+        )
 
     def _buildTable(self, source):
         """
@@ -113,17 +134,16 @@ class Lookup:
                                            self.config.eveningSlopeDuration)
 
         # Create full table and default to nightflat
-        table = [source['night']] * settings.Global.totalDataPoints
+        table = [source['night']] * self.totalDataPoints
 
         for period in self.anatomy:
-            c = 0
+            count = 0
             for rnge in self.anatomy[period]:
                 if period == 'day' or period == 'night':
                     for timeCode in range(rnge[0], rnge[1]):
                         table[timeCode] = source[period]
                 else:
                     for timeCode in range(rnge[0], rnge[1]):
-                        table[timeCode] = source[period][c]
-                        c += 1
-
+                        table[timeCode] = source[period][count]
+                        count += 1
         return table

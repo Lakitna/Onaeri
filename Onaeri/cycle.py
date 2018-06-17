@@ -1,4 +1,3 @@
-import time
 from .lookup import Lookup
 from .helper import sequenceResize, inRange, limitTo, scale, timecodeWrap
 from . import data
@@ -12,12 +11,13 @@ class Cycle:
     """
     Cycle a group of lamps
     """
-    def __init__(self, name, devices, timeKeeper):
+    def __init__(self, name, devices, timeKeeper, scheduler):
         log("Setting up cycle named %s: " % name, end="", flush=True)
 
         if len(devices) == 0:
             log.error("No lamps found with partial name `%s`." % name)
             exit()
+
         self.devices = devices
         self.name = name
         self.update = False
@@ -37,16 +37,25 @@ class Cycle:
                                            self.settings)
             self.lamp[id] = Lamp()
             self.prevLamp[id] = Lamp()
-            settings.dynamic.set(id,
-                                 "power",
-                                 {'off': self.lookup.anatomy['night'][0][0],
-                                  'on': self.lookup.anatomy['morning'][0][0]})
+
+            # Set some dynamic settings for lamp
+            data = {'off': self.lookup.anatomy['night'][0][0],
+                    'on': self.lookup.anatomy['morning'][0][0]}
+            settings.dynamic.set(id, "power", data)
+
+            # Schedule resetting the lamps dynamic power settings
+            scheduler.add(
+                timecodeWrap(data['on'] - settings.Global.schedulerLampOffset),
+                settings.dynamic.set,
+                "Reset dynamic settings for %s" % id,
+                args={"id": id, "group": "power", "data": data}
+            )
 
         log.success("Done")
 
     def tick(self, lampData):
         """
-        Progress cycle.
+        Progress cycle by an arbitrary time unit.
         """
         self.update = False
 
@@ -55,74 +64,112 @@ class Cycle:
                 self.observer[id].look(lampData[id])
 
             if self.time.update or self.observer[id].update:
-                newVals = self.lookup.table(self.time.latestCode)
-                newVals.name = id
-
-                if (self.observer[id].update
-                   and not self.observer[id].turnedOn
-                   and not self.observer[id].turnedOff):
-                    if self.lookup.period == 'evening':
-                        self.deviation[id].change(newVals,
-                                                  self.observer[id].data,
-                                                  self.time.latestCode)
-                    elif self.lookup.period == 'day':
-                        settings.dynamic.set(
-                            id,
-                            'max',
-                            self.observer[id].data(),
-                            keys=['brightness', 'color']
-                        )
-                    elif self.lookup.period == 'night':
-                        settings.dynamic.set(
-                            id,
-                            'min',
-                            self.observer[id].data(),
-                            keys=['brightness', 'color']
-                        )
-
-                newVals = self._applyDynamicSettings(id, newVals)
-
-                if self.observer[id].turnedOff:
-                    self.lamp[id].power = False
-                elif self.observer[id].turnedOn:
-                    if newVals.mode == 'dark' and 'dark' in id.lower():
-                        self.lamp[id].power = False
-                        self.lamp[id].brightness = None
-                    else:
-                        self.lamp[id].copy(newVals)
-                        self.lamp[id].power = None
-                    self.update = True
-                    self.observer[id].legalChange
-                    self.deviation[id].reset()
-                else:
-                    newVals = self.deviation[id].apply(newVals)
-                    self.lamp[id] = self._compareWithPrevious(newVals, id)
-
-                self.prevLamp[id].copy(newVals)
+                lamp = self._updateDevice(id)
+                self.prevLamp[id].copy(lamp)
 
         return self.update
 
-    def _applyDynamicSettings(self, id, lamp):
+    def _updateDevice(self, id):
         """
-        Apply some dynamic settings
+        Update a device
         """
-        dynamicSettings = settings.dynamic.get(id,
-                                               ['max', 'min', 'power'])
-        if lamp.brightness is not None:
-            lamp.brightness = scale(
-                lamp.brightness,
-                settings.Global.valRange,
-                (dynamicSettings['min']['brightness'],
-                 dynamicSettings['max']['brightness'])
+        newVals = self.lookup.table(self.time.latestCode)
+        newVals.name = id
+
+        if self.observer[id].turnedOff:
+            self.lamp[id].power = False
+
+        elif self.observer[id].turnedOn:
+            if newVals.mode == 'dark' and 'dark' in id.lower():
+                self.lamp[id].power = False
+                self.lamp[id].brightness = None
+            else:
+                newVals = self._applyDynamicSettings(id, newVals)
+                self.lamp[id].copy(newVals)
+                self.lamp[id].power = None
+            self.update = True
+            self.observer[id].legalChange
+            self.deviation[id].reset()
+
+        else:
+            if self.observer[id].update:
+                self._periodBasedEvents(id, newVals)
+
+            newVals = self.deviation[id].apply(newVals)
+            newVals = self._applyDynamicSettings(id, newVals)
+            self.lamp[id] = self._compareWithPrevious(newVals, id)
+
+        return newVals
+
+    def _periodBasedEvents(self, id, newVals):
+        """
+        Handle user events based on period of day
+        """
+        period = self.lookup.period
+
+        if period == 'evening':
+            # Temporary cycle deviation
+            self.deviation[id].change(newVals,
+                                      self.observer[id].data,
+                                      self.time.latestCode)
+
+        elif period == 'day':
+            # Change max color and brightness
+            settings.dynamic.set(
+                id,
+                'max',
+                self.observer[id].data(),
+                keys=['brightness', 'color']
             )
 
-        if lamp.color is not None:
-            lamp.color = scale(
-                lamp.color,
-                settings.Global.valRange,
-                (dynamicSettings['min']['color'],
-                 dynamicSettings['max']['color'])
+        elif period == 'night':
+            # Change min color and brightness
+            settings.dynamic.set(
+                id,
+                'min',
+                self.observer[id].data(),
+                keys=['brightness', 'color']
             )
+
+        elif period == 'morning':
+            return
+        else:
+            log.warn("Unknown period %s" % period)
+            return
+
+    def _applyDynamicSettings(self, id, lamp):
+        """
+        Apply dynamic settings
+        """
+        dynamicSettings = settings.dynamic.get(id)
+        vals = [
+            {'val': 'brightness', 'feature': ['dim'], 'setting': 'brightness'},
+            {'val': 'color', 'feature': ['temp', 'color'], 'setting': 'color'},
+            {'val': 'sat', 'feature': ['color'], 'setting': 'color'},
+        ]
+
+        for v in vals:
+            def canDo():
+                for f in v['feature']:
+                    if dynamicSettings['features'][f]:
+                        return True
+                return False
+
+            if getattr(lamp, v['val']) is not None and canDo():
+                setattr(lamp, v['val'], scale(
+                    getattr(lamp, v['val']),
+                    settings.Global.valRange,
+                    (dynamicSettings['min'][v['setting']],
+                     dynamicSettings['max'][v['setting']])
+                ))
+            else:
+                setattr(lamp, v['val'], None)
+
+        lamp.features = dynamicSettings['features']
+        if dynamicSettings['features']['color'] and lamp.mode == 'alert':
+            lamp.color = None
+            lamp.hue = 333
+            lamp.sat = 1000
 
         lamp.power = None
         if self.time.latestCode == dynamicSettings['power']['off']:
@@ -162,24 +209,23 @@ class Cycle:
 
         lamp = Lamp()
         if update():
-            if not new.brightness == self.prevLamp[id].brightness:
-                lamp.brightness = new.brightness
-            if not new.color == self.prevLamp[id].color:
-                lamp.color = new.color
-            if not new.power == self.prevLamp[id].power:
-                lamp.power = new.power
+            vals = ['brightness', 'color', 'hue', 'sat', 'power']
+            for v in vals:
+                if not getattr(new, v) == getattr(self.prevLamp[id], v):
+                    setattr(lamp, v, getattr(new, v))
 
             if lamp.power is True:
-                lamp.brightness = new.brightness
-                lamp.color = new.color
+                for v in vals:
+                    if not v == 'power':
+                        setattr(lamp, v, getattr(new, v))
 
             lamp.mode = new.mode
-
             if lamp.mode == 'dark' and len(self.devices) > 1:
                 if 'dark' in id.lower():
                     lamp.brightness = None
                     lamp.power = False
 
+            lamp.features = new.features
             lamp.name = id
             self.update = True
             self.observer[id].legalChange
@@ -211,7 +257,8 @@ class Deviation:
         """
         self.reset()
         self.duration = self._calculateDuration(timeCode)
-        self.table = sequenceResize(data.deviation, self.duration)
+        self.table = sequenceResize(data.deviation,  # pylint: disable
+                                    self.duration)
 
         if changeVals.power and self.duration > 0:
             if changeVals.color is None:
@@ -225,8 +272,12 @@ class Deviation:
                 self.setValues['brightness'] = (changeVals.brightness
                                                 - dataVals.brightness)
 
-            if not inRange(self.setValues['brightness'], (-10, 10)) \
-               or not inRange(self.setValues['color'], (-10, 10)):
+            valRange = settings.Global.valRange
+            rnge = (valRange[1] - valRange[0]) // 100
+            rnge = (-rnge, rnge)  # (-10, 10) for valRange = (0, 1000)
+
+            if not inRange(self.setValues['brightness'], rnge) \
+               or not inRange(self.setValues['color'], rnge):
                 self.values = self.setValues.copy()
                 self.active = True
 

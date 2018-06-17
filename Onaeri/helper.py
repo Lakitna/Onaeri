@@ -9,20 +9,16 @@ def scale(val, inRange, outRange, decimals=0):
     if val is None:
         return None
 
-    ret = (
+    result = (
         ((val - inRange[0]) / (inRange[1] - inRange[0]))
         * (outRange[1] - outRange[0])
         + outRange[0]
     )
 
-    if ret % 1 == 0:
-        ret = round(ret)
-    elif decimals == 0:
-        ret = round(ret)
+    if decimals == 0 or result % 1 == 0:
+        return round(result)
     else:
-        ret = round(ret, decimals)
-
-    return ret
+        return round(result, decimals)
 
 
 def sequenceResize(source, length):
@@ -57,19 +53,22 @@ def limitTo(val, rnge):
     return val
 
 
-def timecodeRange(min, max):
+def timecodeRange(min_val, max_val, rngeMax=None):
     """
     Get a timecode range. Supports 0 hour rollover.
     """
-    max = timecodeWrap(max)
-    min = timecodeWrap(min)
+    if rngeMax is None:
+        rngeMax = settings.Global.totalDataPoints
 
-    rnge = [(min, max)]
+    max_val = timecodeWrap(max_val, rngeMax)
+    min_val = timecodeWrap(min_val, rngeMax)
 
-    if max < min:
+    rnge = [(min_val, max_val)]
+
+    if max_val < min_val:
         rnge = [
-            (min, settings.Global.totalDataPoints),
-            (0, max)
+            (min_val, rngeMax),
+            (0, max_val)
         ]
 
     for phase in rnge:
@@ -81,7 +80,7 @@ def timecodeRange(min, max):
 
 def inRange(val, rnge):
     """
-    Find out if input value is within a given absolute range
+    Is the input value within one or multiple given absolute ranges
     """
     def do(value, rnge):
         if rnge[0] <= value <= rnge[1]:
@@ -91,7 +90,7 @@ def inRange(val, rnge):
         return False
 
     for r in rnge:
-        if type(r) is tuple or type(r) is list:
+        if isinstance(r, (tuple, list)):
             if len(r) == 2:
                 if do(val, r):
                     return True
@@ -102,12 +101,15 @@ def inRange(val, rnge):
     return False
 
 
-def timecodeWrap(val):
+def timecodeWrap(val, rngeMax=None):
     """
     Wrap the input so that it's always within timecode range.
     """
+    if rngeMax is None:
+        rngeMax = settings.Global.totalDataPoints
+
     if val < 0:
-        val += settings.Global.totalDataPoints
-    elif val > settings.Global.totalDataPoints:
-        val -= settings.Global.totalDataPoints
+        val += rngeMax
+    elif val > rngeMax:
+        val -= rngeMax
     return val
