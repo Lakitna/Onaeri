@@ -106,11 +106,15 @@ class Lamp:
     def brightness(self, value):
         if value is None:
             self._brightness = None
-        elif inRange(value, valRange):
-            self._brightness = value
+        elif type(value) is int:
+            if inRange(value, valRange):
+                self._brightness = value
+            else:
+                log.warn("[Lamp] Brightness input value error. " +
+                         "%d given, allowed range %s" % (value, str(valRange)))
         else:
-            log.warn("[Lamp] Brightness input value error. " +
-                     "%d given, allowed range %s" % (value, str(valRange)))
+            log.error("[Lamp] Brightness requires a integer, not a %s"
+                      % type(value))
 
     @property
     def color(self):
@@ -120,11 +124,15 @@ class Lamp:
     def color(self, value):
         if value is None:
             self._color = None
-        elif inRange(value, valRange):
-            self._color = value
+        elif type(value) is int:
+            if inRange(value, valRange):
+                self._color = value
+            else:
+                log.warn("[Lamp] Color input value error. " +
+                         "%d given, allowed range %s" % (value, str(valRange)))
         else:
-            log.warn("[Lamp] Color input value error. " +
-                     "%d given, allowed range %s" % (value, str(valRange)))
+            log.error("[Lamp] Color requires a integer, not a %s"
+                      % type(value))
 
     @property
     def hue(self):
@@ -134,11 +142,15 @@ class Lamp:
     def hue(self, value):
         if value is None:
             self._hue = None
-        elif inRange(value, valRange):
-            self._hue = value
+        elif type(value) is int:
+            if inRange(value, valRange):
+                self._hue = value
+            else:
+                log.warn("[Lamp] Hue input value error. " +
+                         "%d given, allowed range %s" % (value, str(valRange)))
         else:
-            log.warn("[Lamp] Hue input value error. " +
-                     "%d given, allowed range %s" % (value, str(valRange)))
+            log.error("[Lamp] Hue requires a integer, not a %s"
+                      % type(value))
 
     @property
     def sat(self):
@@ -148,11 +160,15 @@ class Lamp:
     def sat(self, value):
         if value is None:
             self._sat = None
-        elif inRange(value, valRange):
-            self._sat = value
+        elif type(value) is int:
+            if inRange(value, valRange):
+                self._sat = value
+            else:
+                log.warn("[Lamp] Saturation input value error. " +
+                         "%d given, allowed range %s" % (value, str(valRange)))
         else:
-            log.warn("[Lamp] Saturation input value error. " +
-                     "%d given, allowed range %s" % (value, str(valRange)))
+            log.error("[Lamp] Saturation requires a integer, not a %s"
+                      % type(value))
 
     @property
     def name(self):

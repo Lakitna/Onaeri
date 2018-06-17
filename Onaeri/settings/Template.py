@@ -28,5 +28,5 @@ morningSlopeDuration = 60
 # Duration of eveningslope in minutes
 eveningSlopeDuration = 400
 
-# Minimum time in minutes a duration cycle should run
+# Temporary cycle deviation duration in minutes
 deviationDuration = 30

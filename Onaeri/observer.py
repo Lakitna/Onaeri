@@ -47,8 +47,7 @@ class Observer:
                     setattr(newData, v, limitTo(getattr(newData, v), valRange))
 
             if not self._legalChange:
-                self._detectChange(newData, self.data)
-                self.data = newData
+                self.data = self._sameData(newData, self.data)
             else:
                 self.data = newData
 
@@ -61,7 +60,7 @@ class Observer:
         """
         self._legalChange = True
 
-    def _detectChange(self, new, prev):
+    def _sameData(self, new, prev):
         """
         Compare new to previous lamp values.
         Returns lamp object and sets update flag.
@@ -78,3 +77,5 @@ class Observer:
             log.highlight("[[time]] Change detected in %s: %s"
                           % (new.name, lamp))
             self.update = True
+
+        return new

@@ -7,11 +7,12 @@ class TimeKeeper:
     """
     Handles timekeeping in timecodes
     """
-    def __init__(self):
-        self._minPerTimeCode = settings.Global.minPerTimeCode
-        self.latestCode = self.code()
-        self.update = True
-        self.runtime = 0
+    def __init__(self, minpertimecode=None,
+                 runtime=0, update=True, latestcode=None):
+        self._minPerTimeCode = minpertimecode or settings.Global.minPerTimeCode
+        self.latestCode = latestcode or self.code()
+        self.update = update
+        self.runtime = runtime
 
     def tick(self):
         """

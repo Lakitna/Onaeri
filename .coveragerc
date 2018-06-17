@@ -1,16 +1,20 @@
 [run]
 source = Onaeri
 
+branch = True
 omit =
     Onaeri/__main__.py
     Onaeri/settings/Template.py
     Onaeri/settings/Global.py
+    */site-packages/*
+    test/*
 
 [report]
 # Regexes for lines to exclude from consideration
 exclude_lines =
     # Don't complain about missing debug-only code:
     def __repr__
+    def __str__
 
     # Don't complain if tests don't hit defensive assertion code:
     raise AssertionError

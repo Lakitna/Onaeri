@@ -4,7 +4,7 @@ import time
 from ...logger import log
 from .. import Global
 
-enableLogs = False
+enableLogs = True
 
 blacklist = ['__init__.py']
 expectedExtention = "json"
@@ -103,7 +103,7 @@ def _reset(id):
         f.write(json.dumps(fileTemplate))
 
 
-def cleanup(days=Global.dynamicSettingsKeep):
+def _cleanup(days=Global.dynamicSettingsKeep):
     """
     Remove old dynamic settings
     """
@@ -127,4 +127,4 @@ def cleanup(days=Global.dynamicSettingsKeep):
             log("[Cleanup] Removed old dynamic settings file `%s`." % f)
 
 
-cleanup()
+_cleanup()

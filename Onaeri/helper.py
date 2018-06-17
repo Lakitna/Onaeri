@@ -21,6 +21,7 @@ def scale(val, inRange, outRange, decimals=0):
         return round(result, decimals)
 
 
+
 def sequenceResize(source, length):
     """
     Resize a data sequence.
@@ -44,64 +45,72 @@ def limitTo(val, rnge):
     """
     Limit input value to a given absolute range
     """
-    if val is not None:
-        if val < rnge[0]:
-            return rnge[0]
-        if val > rnge[1]:
-            return rnge[1]
+    if val is None:
+        return None
+    if val < rnge[0]:
+        val = rnge[0]
+    if val > rnge[1]:
+        val = rnge[1]
     return val
 
 
-def timecodeRange(min, max):
+def timecodeRange(min, max, rngeMax=None):
     """
     Get a timecode range. Supports 0 hour rollover.
     """
-    max = timecodeWrap(max)
-    min = timecodeWrap(min)
+    if rngeMax is None:
+        rngeMax = settings.Global.totalDataPoints
+
+    max = timecodeWrap(max, rngeMax)
+    min = timecodeWrap(min, rngeMax)
+
+    rnge = [(min, max)]
 
     if max < min:
         rnge = [
-            (min, settings.Global.totalDataPoints),
+            (min, rngeMax),
             (0, max)
         ]
 
-        # Remove range phases where min == max
-        for phase in rnge:
-            if phase[0] == phase[1]:
-                rnge.remove(phase)
+    for phase in rnge:
+        if phase[0] == phase[1]:
+            rnge.remove(phase)
 
-        return rnge
-    else:
-        return [(min, max)]
+    return rnge
 
 
 def inRange(val, rnge):
     """
     Is the input value within one or multiple given absolute ranges
     """
+    def do(value, rnge):
+        if rnge[0] <= value <= rnge[1]:
+            return True
+
     if val is None:
         return False
 
-    if type(rnge[0]) is int:
-        if rnge[0] > rnge[1]:
-            rnge = (rnge[1], rnge[0])
-        if rnge[0] <= val <= rnge[1]:
-            return True
-    else:
-        for r in rnge:
-            if r[0] > r[1]:
-                r = (r[1], r[0])
-            if r[0] <= val <= r[1]:
+    for r in rnge:
+        if type(r) is tuple or type(r) is list:
+            if len(r) == 2:
+                if do(val, r):
+                    return True
+        else:
+            if do(val, rnge):
                 return True
+            break
     return False
 
 
-def timecodeWrap(val):
+def timecodeWrap(val, rngeMax=None):
     """
     Wrap the input so that it's always within timecode range.
     """
+    if rngeMax is None:
+        rngeMax = settings.Global.totalDataPoints
+
     if val < 0:
-        return val + settings.Global.totalDataPoints
-    if val > settings.Global.totalDataPoints:
-        return val - settings.Global.totalDataPoints
+        val += rngeMax
+    elif val > rngeMax:
+        val -= rngeMax
     return val

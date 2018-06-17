@@ -16,6 +16,7 @@ class Cycle:
 
         if len(devices) == 0:
             log.error("No lamps found with partial name `%s`." % name)
+            exit()
 
         self.devices = devices
         self.name = name
@@ -256,7 +257,8 @@ class Deviation:
         """
         self.reset()
         self.duration = self._calculateDuration(timeCode)
-        self.table = sequenceResize(data.deviation, self.duration)
+        self.table = sequenceResize(data.deviation,  # pylint: disable
+                                    self.duration)
 
         if changeVals.power and self.duration > 0:
             if changeVals.color is None:
