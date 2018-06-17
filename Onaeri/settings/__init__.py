@@ -103,7 +103,6 @@ cycles = _settingFileList()
 if len(cycles) == 0:
     log.error("No setting files found. Please create a file " +
               "in the `settings` folder using the Template.py.")
-    exit()
 
 
 def get(settingFile=""):
