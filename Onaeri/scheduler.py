@@ -11,7 +11,7 @@ class Scheduler:
         self.add((0, 0), log.fileManagement, "Log file management")
         self.add((3, 0), dynamic._cleanup, "Dynamic settings file cleanup")
 
-    def add(self, time, function, description=None, args={}):
+    def add(self, time, function, description=None, args=None):
         """
         Add an event to the schedule
         """
@@ -21,7 +21,9 @@ class Scheduler:
                 return keyExists(key + 1)
             return key
 
-        if type(time) is not int:
+        if args is None:
+            args = {}
+        if not isinstance(time, int):
             if len(time) < 2:
                 time = (time, 0)
             time = self.time.code(h=time[0], m=time[1], dry=True)

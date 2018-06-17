@@ -2,9 +2,7 @@ import pytest
 import os
 import shutil
 
-"""
-Create a setting file for the test procedure
-"""
+# Create a setting file for the test procedure
 folderPath = os.path.dirname(os.path.abspath(__file__))
 folderPath = os.path.split(folderPath)[0] + "/Onaeri/settings"
 
@@ -13,12 +11,8 @@ dstfile = folderPath + '/test.py'
 
 shutil.copy(srcfile, dstfile)
 
-"""
-Actually run pytest
-"""
+# Actually run pytest
 pytest.main()
 
-"""
-Remove the test settings file
-"""
+# Remove the test settings file
 os.remove(dstfile)
