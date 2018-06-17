@@ -21,7 +21,6 @@ def scale(val, inRange, outRange, decimals=0):
         return round(result, decimals)
 
 
-
 def sequenceResize(source, length):
     """
     Resize a data sequence.
