@@ -56,7 +56,7 @@ class Lamp:
         Copy an object of same type
         """
         for var in self.__dict__:
-            exec("self.%s = obj.%s" % (var, var))
+            setattr(self, var, getattr(obj, var))
 
     def empty(self):
         """

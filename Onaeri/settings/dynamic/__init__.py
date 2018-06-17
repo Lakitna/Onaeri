@@ -18,8 +18,8 @@ fileTemplate = {
 }
 
 
-def get(id, groups=None):
-    filePath = "%s/%s.%s" % (folderPath, id, expectedExtention)
+def get(id_, groups=None):
+    filePath = "%s/%s.%s" % (folderPath, id_, expectedExtention)
     try:
         content = json.load(open(filePath))
     except (FileNotFoundError, json.decoder.JSONDecodeError):
@@ -28,7 +28,7 @@ def get(id, groups=None):
 
     ret = {}
     if groups is not None:
-        if type(groups) is str or type(groups) is int:
+        if isinstance(groups, (str, int)):
             # Make groups iterable if it isn't
             groups = [groups]
 
@@ -36,14 +36,14 @@ def get(id, groups=None):
             try:
                 ret[group] = content[group]
             except KeyError:
-                _reset(id)
+                _reset(id_)
     else:
         ret = content
 
     if len(ret) == 1:
         ret = ret[sorted(ret.keys())[0]]
 
-    set(id, 'meta', {'called': time.time()})
+    set(id_, 'meta', {'called': time.time()})
 
     return ret
 
@@ -57,7 +57,7 @@ def set(id, group, data, keys=None):
         set(id, group, data, keys)
         return
 
-    if type(data) is dict:
+    if isinstance(data, dict):
         if group not in content:
             content[group] = {}
         if keys is None:
@@ -95,10 +95,10 @@ def list():
     return ret
 
 
-def _reset(id):
-    log.warn("Dynamic settings for `%s` have been reset." % id)
+def _reset(id_):
+    log.warn("Dynamic settings for `%s` have been reset." % id_)
 
-    filePath = "%s/%s.%s" % (folderPath, id, expectedExtention)
+    filePath = "%s/%s.%s" % (folderPath, id_, expectedExtention)
     with open(filePath, 'w') as f:
         f.write(json.dumps(fileTemplate))
 

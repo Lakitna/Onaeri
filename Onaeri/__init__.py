@@ -55,16 +55,16 @@ class Onaeri:
                 self.update = True
 
             if self.time.update:
-                for id in cycle.lamp:
+                for id_ in cycle.lamp:
                     log.blind("[time]\t%s\t%s\t%s\t%s\t%s\t%s\t%s" % (
-                        cycle.observer[id].data.brightness,
-                        cycle.observer[id].data.color,
-                        cycle.observer[id].data.hue,
-                        cycle.observer[id].data.sat,
-                        cycle.observer[id].data.power,
-                        cycle.observer[id].update,
-                        cycle.deviation[id].active
-                    ), id)
+                        cycle.observer[id_].data.brightness,
+                        cycle.observer[id_].data.color,
+                        cycle.observer[id_].data.hue,
+                        cycle.observer[id_].data.sat,
+                        cycle.observer[id_].data.power,
+                        cycle.observer[id_].update,
+                        cycle.deviation[id_].active
+                    ), id_)
 
         self.time.tick()
         self.scheduler.tick()

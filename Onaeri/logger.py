@@ -90,7 +90,7 @@ class Logger:
         self.__call__("Generated on [datetime]")
         self.row()
         for key in values:
-            if type(values[key]) is dict:
+            if isinstance(values[key], dict):
                 self.__call__("%s:" % key)
                 for subkey in values[key]:
                     spacing = " " * (20 - len(subkey))
@@ -109,7 +109,8 @@ class Logger:
         """
         self.__call__(self._hr)
 
-    def _fileHeaders(self, name):
+    @staticmethod
+    def _fileHeaders(name):
         """
         Build file headers
         """

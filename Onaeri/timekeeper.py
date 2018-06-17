@@ -40,7 +40,7 @@ class TimeKeeper:
         if s is None:
             s = 0
 
-        if type(h) is tuple:
+        if isinstance(h, tuple):
             if len(h) > 2:
                 s = h[2]
             if len(h) > 1:
