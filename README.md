@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/Lakitna/Onaeri.svg?branch=master)](https://travis-ci.org/Lakitna/Onaeri) [![Coverage Status](https://coveralls.io/repos/github/Lakitna/Onaeri/badge.svg?branch=master)](https://coveralls.io/github/Lakitna/Onaeri?branch=master)
+[![Build Status](https://travis-ci.org/Lakitna/Onaeri.svg?branch=master)](https://travis-ci.org/Lakitna/Onaeri) [![Coverage Status](https://coveralls.io/repos/github/Lakitna/Onaeri/badge.svg)](https://coveralls.io/github/Lakitna/Onaeri)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/da14876917a5452cb77d38058bd339b3)](https://www.codacy.com/app/Lakitna/Onaeri?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Lakitna/Onaeri&amp;utm_campaign=Badge_Grade)
 
 # Onæri
 Onaeri helps to improve the users sleep rhythm by manipulating the lamps around the user.

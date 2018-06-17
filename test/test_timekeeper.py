@@ -1,48 +1,61 @@
-from ..timekeeper import TimeKeeper
+import pytest
+from ..Onaeri.timekeeper import TimeKeeper
 
 
-def test_tick():
-    t = TimeKeeper()
-    t._minPerTimeCode = 1
-    t.latestCode = 0
-    assert t.runtime == 0
-
-    t.tick()
-    assert t.update is True
-    assert t.runtime == 1
-
-    t.tick()
-    assert t.update is False
-    assert t.runtime == 1
+@pytest.fixture
+def timekeeper():
+    return TimeKeeper(
+        minpertimecode=1, latestcode=10, runtime=0, update=True
+    )
 
 
-def test_code():
-    t = TimeKeeper()
-    t._minPerTimeCode = .1
-    assert t.code(h=1) == 600
-    assert t.code(h=2) == 1200
-    assert t.code(m=1) == 10
+def test_tick(timekeeper):
+    timekeeper.tick()
+    assert timekeeper.update is True
+    assert timekeeper.runtime == 1
 
-    t._minPerTimeCode = .123
-    assert t.code(h=1) == 487
-    assert t.code(h=2) == 975
-    assert t.code(m=1) == 8
-
-    t._minPerTimeCode = 2
-    assert t.code(h=1) == 30
-    assert t.code(h=2) == 60
-    assert t.code(m=1) == 0
-
-    for i in range(1, 30):
-        t._minPerTimeCode = i / 10
-        max = t.code(h=12, m=30)
-        assert round(max * t._minPerTimeCode) in range(748, 752)
+    timekeeper.tick()
+    assert timekeeper.update is False
+    assert timekeeper.runtime == 1
 
 
-def test_timestamp():
-    t = TimeKeeper()
-    t._minPerTimeCode = 1
-    t.code(h=12, m=30, s=10)
-    assert t.timestamp == "12:30:00"
-    t.code(h=12, m=1, s=30)
-    assert t.timestamp == "12:01:00"
+make_code_test_cases = (
+    ("comment", "minPerTimeCode", "kwargs", "expected"),
+    [
+        ("basic hour", .1, {'h': 1}, 600),
+        ("basic hour minute", .1, {'h': 1, 'm': 14}, 740),
+        ("basic minute second", .1, {'s': 10, 'm': 14}, 141),
+
+        ("complex hour", .123, {'h': 1}, 487),
+        ("complex hour minute", .123, {'h': 1, 'm': 14}, 601),
+        ("complex minute second", .123, {'s': 10, 'm': 14}, 115),
+
+        ("syntactical hour tuple", .1, {'h': (1)}, 600),
+        ("syntactical hour/minute tuple", .1, {'h': (1, 14)}, 740),
+        ("syntactical hour/minute/second tuple", .1, {'h': (1, 14, 10)}, 741),
+    ]
+)
+
+
+@pytest.mark.parametrize(*make_code_test_cases)
+def test_make_code(comment, minPerTimeCode, kwargs, expected):
+    timekeeper = TimeKeeper(minpertimecode=minPerTimeCode)
+    assert timekeeper.code(**kwargs) == expected
+    assert timekeeper.latestCode == expected
+
+
+def test_make_code_dry(timekeeper):
+    timekeeper.code(1)
+    assert timekeeper.code(2, dry=True) == 120
+    assert timekeeper.latestCode == 60
+
+
+def test_timestamp_simple(timekeeper):
+    timekeeper.code(h=12, m=30, s=10)
+    assert timekeeper.timestamp() == "12:30:00"
+
+
+def test_timestamp_with_seconds(timekeeper):
+    timekeeper._minPerTimeCode = .123
+    timekeeper.code(h=12, m=1, s=24)
+    assert timekeeper.timestamp() == "12:01:23"

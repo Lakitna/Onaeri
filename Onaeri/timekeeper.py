@@ -7,11 +7,12 @@ class TimeKeeper:
     """
     Handles timekeeping in timecodes
     """
-    def __init__(self):
-        self._minPerTimeCode = settings.Global.minPerTimeCode
-        self.latestCode = self.code()
-        self.update = True
-        self.runtime = 0
+    def __init__(self, minpertimecode=None,
+                 runtime=0, update=True, latestcode=None):
+        self._minPerTimeCode = minpertimecode or settings.Global.minPerTimeCode
+        self.latestCode = latestcode or self.code()
+        self.update = update
+        self.runtime = runtime
 
     def tick(self):
         """
@@ -39,7 +40,7 @@ class TimeKeeper:
         if s is None:
             s = 0
 
-        if type(h) is tuple:
+        if isinstance(h, tuple):
             if len(h) > 2:
                 s = h[2]
             if len(h) > 1:
@@ -51,12 +52,14 @@ class TimeKeeper:
             self.latestCode = ret
         return ret
 
-    @property
-    def timestamp(self):
+    def timestamp(self, code=None):
         """
         Return the timestring of a timecode
         """
-        minutes = self.latestCode * self._minPerTimeCode
+        if code is None:
+            code = self.latestCode
+
+        minutes = code * self._minPerTimeCode
         h = math.floor(minutes / 60)
         m = math.floor(minutes % 60)
         s = math.floor((minutes % 1) * 60)

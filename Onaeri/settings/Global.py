@@ -31,3 +31,7 @@ valRange = (0, 1000)
 
 # Range of data values, int.
 dataRange = (0, 1000)
+
+# Time offset in minutes for scheduler, unsigned int.
+# [lamp on time] - [offset] = [scheduled time]
+schedulerLampOffset = round(10 // minPerTimeCode)
