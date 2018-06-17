@@ -1,6 +1,11 @@
 [run]
+source = Onaeri
+
 branch = True
 omit =
+    Onaeri/__main__.py
+    Onaeri/settings/Template.py
+    Onaeri/settings/Global.py
     */site-packages/*
     test/*
 

@@ -40,10 +40,11 @@ class TimeKeeper:
         if s is None:
             s = 0
 
-        if type(h) is tuple:
+        if isinstance(h, tuple):
             if len(h) > 2:
                 s = h[2]
-            m = h[1]
+            if len(h) > 1:
+                m = h[1]
             h = h[0]
 
         ret = math.floor(((h * 60) + m + (s / 60)) / self._minPerTimeCode)
@@ -51,12 +52,14 @@ class TimeKeeper:
             self.latestCode = ret
         return ret
 
-    @property
-    def timestamp(self):
+    def timestamp(self, code=None):
         """
         Return the timestring of a timecode
         """
-        minutes = self.latestCode * self._minPerTimeCode
+        if code is None:
+            code = self.latestCode
+
+        minutes = code * self._minPerTimeCode
         h = math.floor(minutes / 60)
         m = math.floor(minutes % 60)
         s = math.floor((minutes % 1) * 60)

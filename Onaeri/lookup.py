@@ -58,11 +58,13 @@ class Lookup:
             settings.Global.valRange
         )
 
-        darkrange = timecodeRange(self._sleepTime - self._windDownTime,
-                                  self._sleepTime)
-
-        if (self.get_period(timeCode) == 'night'
-           or inRange(timeCode, darkrange)):
+        darkrange = timecodeRange(
+            self._sleepTime - self._windDownTime,
+            self.anatomy['night'][-1][1] - self._alarmOffset
+        )
+        if timeCode == darkrange[0][0]:
+            self.lamp.mode = 'alert'
+        elif inRange(timeCode, darkrange):
             self.lamp.mode = 'dark'
         else:
             self.lamp.mode = None

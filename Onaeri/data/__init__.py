@@ -4,7 +4,7 @@ import sys
 from ..logger import log
 
 required = ['brightness', 'color', 'deviation']
-blacklist = ['__init__.py', 'logger.py']
+blacklist = ['__init__.py']
 expectedExtention = "json"
 
 # Brightness evening: y = -(100 / (500^1.7))x^1.7 + 100 for 1 <= x <= 500

@@ -63,7 +63,7 @@ def test_init_filled():
 def test_magic_call():
     lamp = Lamp(100, 90, True, "testName", "testMode")
     assert type(lamp()) is dict  # Correct type
-    assert len(lamp()) == 5  # Correct length
+    assert len(lamp()) == 8  # Correct length
     assert lamp()['brightness'] == 100  # Correctly callable
 
 
@@ -137,7 +137,14 @@ def test_isempty_subset():
 
 
 def test_empty():
+    lamp = Lamp(100, 50, False)
+    assert lamp.isEmpty() is False
+    lamp.empty()
+    assert lamp.isEmpty() is True
     lamp = Lamp(100, 90, True)
     assert lamp.isEmpty() is False
     lamp.empty()
     assert lamp.isEmpty() is True
+    lamp = Lamp(100, None, None)
+    assert lamp.isEmpty(['color', 'power']) is True
+    assert lamp.isEmpty(['brightness', 'color']) is False

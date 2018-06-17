@@ -15,6 +15,7 @@ class Observer:
         self.turnedOff = False
         self._cycleName = cycleName
         self._legalChange = True
+        self._valList = ['brightness', 'color', 'power', 'hue', 'sat']
 
     def __str__(self):
         """
@@ -41,8 +42,9 @@ class Observer:
             if self.data.power is True and newData.power is False:
                 self.turnedOff = True
 
-            newData.color = limitTo(newData.color, valRange)
-            newData.brightness = limitTo(newData.brightness, valRange)
+            for v in self._valList:
+                if not v == 'power':
+                    setattr(newData, v, limitTo(getattr(newData, v), valRange))
 
             if not self._legalChange:
                 self.data = self._sameData(newData, self.data)
@@ -63,18 +65,17 @@ class Observer:
         Compare new to previous lamp values.
         Returns lamp object and sets update flag.
         """
-        if not prev == new:
-            lamp = Lamp()
-            lamp.copy(new)
+        change = False
+        lamp = Lamp()
 
-            if lamp.brightness == prev.brightness:
-                lamp.brightness = None
-            if lamp.color == prev.color:
-                lamp.color = None
-            if lamp.power == prev.power:
-                lamp.power = None
+        for val in self._valList:
+            if getattr(new, val) != getattr(prev, val):
+                setattr(lamp, val, getattr(new, val))
+                change = True
 
+        if change:
             log.highlight("[[time]] Change detected in %s: %s"
-                          % (self._cycleName, lamp))
+                          % (new.name, lamp))
             self.update = True
+
         return new
