@@ -9,7 +9,7 @@ class Scheduler:
         self.events = {}
 
         self.add((0, 0), log.fileManagement, "Log file management")
-        self.add((3, 0), dynamic.cleanup, "Dynamic settings file cleanup")
+        self.add((3, 0), dynamic._cleanup, "Dynamic settings file cleanup")
 
     def add(self, time, function, description=None, args={}):
         """

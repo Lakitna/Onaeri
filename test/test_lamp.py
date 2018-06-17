@@ -63,7 +63,7 @@ def test_init_filled():
 def test_magic_call():
     lamp = Lamp(100, 90, True, "testName", "testMode")
     assert type(lamp()) is dict  # Correct type
-    assert len(lamp()) == 5  # Correct length
+    assert len(lamp()) == 8  # Correct length
     assert lamp()['brightness'] == 100  # Correctly callable
 
 

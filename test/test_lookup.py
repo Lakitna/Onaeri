@@ -56,8 +56,13 @@ get_from_table_mode_test_cases = (
         ),
         (
             "darkMode winddown evening",
-            config().sleepTime[0] * 60 - config().windDownTime,
+            config().sleepTime[0] * 60 - config().windDownTime + 1,
             "dark", "evening"
+        ),
+        (
+            "alert winddown evening",
+            config().sleepTime[0] * 60 - config().windDownTime,
+            "alert", "evening"
         ),
         (
             "noMode evening",

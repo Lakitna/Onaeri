@@ -52,10 +52,10 @@ def test_make_code_dry(timekeeper):
 
 def test_timestamp_simple(timekeeper):
     timekeeper.code(h=12, m=30, s=10)
-    assert timekeeper.timestamp == "12:30:00"
+    assert timekeeper.timestamp() == "12:30:00"
 
 
 def test_timestamp_with_seconds(timekeeper):
     timekeeper._minPerTimeCode = .123
     timekeeper.code(h=12, m=1, s=24)
-    assert timekeeper.timestamp == "12:01:23"
+    assert timekeeper.timestamp() == "12:01:23"
