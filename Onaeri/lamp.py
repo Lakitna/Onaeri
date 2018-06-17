@@ -106,7 +106,7 @@ class Lamp:
     def brightness(self, value):
         if value is None:
             self._brightness = None
-        elif type(value) is int:
+        elif isinstance(value, int):
             if inRange(value, valRange):
                 self._brightness = value
             else:
@@ -124,7 +124,7 @@ class Lamp:
     def color(self, value):
         if value is None:
             self._color = None
-        elif type(value) is int:
+        elif isinstance(value, int):
             if inRange(value, valRange):
                 self._color = value
             else:
@@ -142,7 +142,7 @@ class Lamp:
     def hue(self, value):
         if value is None:
             self._hue = None
-        elif type(value) is int:
+        elif isinstance(value, int):
             if inRange(value, valRange):
                 self._hue = value
             else:
@@ -160,7 +160,7 @@ class Lamp:
     def sat(self, value):
         if value is None:
             self._sat = None
-        elif type(value) is int:
+        elif isinstance(value, int):
             if inRange(value, valRange):
                 self._sat = value
             else:
